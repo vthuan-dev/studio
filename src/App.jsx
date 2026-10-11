@@ -15,7 +15,6 @@ import CustomerModal from './components/forms/CustomerModal';
 import PaymentModal from './components/forms/PaymentModal';
 import RevenueStatsModal from './components/desktop/RevenueStatsModal';
 import NotificationModal from './components/common/NotificationModal';
-import ExportBackupModal from './components/common/ExportBackupModal';
 import InvoiceModal from './components/common/InvoiceModal';
 import StaffModal from './components/common/StaffModal';
 import ServicesModal from './components/common/ServicesModal';
@@ -93,7 +92,6 @@ function StudioApp() {
       <PaymentModal />
       <RevenueStatsModal />
       <NotificationModal />
-      <ExportBackupModal />
       <InvoiceModal />
       <StaffModal />
       <ServicesModal />

@@ -308,14 +308,7 @@ export default function TopHeader() {
           <BarChart3 className="w-4 h-4 text-[#8D5B4C]" />
         </button>
 
-        {/* Export / Backup button */}
-        <button
-          onClick={() => setIsExportModalOpen(true)}
-          className="p-2.5 rounded-xl bg-[#F5EFE6] text-[#6C5F57] hover:text-[#2C2420] hover:bg-[#EFE5D8] border border-[#E5DCD0] transition-colors"
-          title="Sao lưu dữ liệu & Xuất file Excel / Phiếu thu"
-        >
-          <FileSpreadsheet className="w-4 h-4 text-[#2E7D32]" />
-        </button>
+
 
         {/* Notification Bell */}
         <div className="relative">
@@ -484,16 +477,6 @@ export default function TopHeader() {
                   <span>Nhắc lịch hẹn (3 thông báo)</span>
                 </button>
 
-                <button
-                  onClick={() => {
-                    setIsExportModalOpen(true);
-                    setIsProfileOpen(false);
-                  }}
-                  className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[#2C2420] hover:bg-[#FAF7F2] font-medium text-left"
-                >
-                  <FileSpreadsheet className="w-4 h-4 text-[#2E7D32]" />
-                  <span>Xuất Excel & Sao lưu</span>
-                </button>
               </div>
 
               <div className="pt-2 border-t border-[#EFE8DE]">

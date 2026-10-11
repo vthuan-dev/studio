@@ -76,13 +76,7 @@ export default function Sidebar() {
       label: 'Báo cáo doanh thu', 
       icon: TrendingUp,
       type: 'modal'
-    },
-    { 
-      id: 'cai-dat', 
-      label: 'Cài đặt & Sao lưu', 
-      icon: Settings,
-      type: 'modal'
-    },
+    }
   ];
 
   const handleTabClick = (item) => {
