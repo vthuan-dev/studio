@@ -16,6 +16,11 @@ MEYZI STUDIO là phần mềm quản lý chuyên biệt dành cho studio trang �
   4. Truy cập hệ thống trên trình duyệt:
      http://localhost:5173/
 
+- Thông tin đăng nhập bảo mật hệ thống:
+  - Tài khoản: admin
+  - Mật khẩu: 10102020
+  - Hệ thống ghi nhớ phiên đăng nhập trên thiết bị. Bạn có thể bấm "Đăng xuất" ở menu hồ sơ hoặc thanh điều hướng bất kỳ lúc nào để khóa lại hệ thống.
+
 ---
 
 ## 3. Quản lý lịch hẹn và khách hàng
