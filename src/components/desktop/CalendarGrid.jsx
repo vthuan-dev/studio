@@ -471,51 +471,75 @@ export default function CalendarGrid() {
 
                 <div className="flex items-center gap-1">
                   {bookings.length > 0 && (
-                    <span className="text-[10px] text-[#A3968A] font-medium pr-0.5">
-                      {bookings.length} lịch
-                    </span>
+                    <>
+                      <span className="text-[10px] text-[#A3968A] font-medium pr-0.5">
+                        {bookings.length} lịch
+                      </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedDate(cell.fullDate);
+                          openAddModal({ date: cell.fullDate, time: '08:00' });
+                        }}
+                        className="w-5 h-5 rounded-md flex items-center justify-center text-[#8D5B4C] hover:bg-[#8D5B4C] hover:text-white transition-all opacity-0 group-hover:opacity-100 bg-[#F5EFE6]"
+                        title={`Thêm lịch ngày ${cell.day}`}
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                      </button>
+                    </>
                   )}
+                </div>
+              </div>
+
+              {/* Bookings inside cell OR Prominent + button when day is empty */}
+              {bookings.length === 0 ? (
+                <div className="flex-1 flex items-center justify-center py-1">
                   <button
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       setSelectedDate(cell.fullDate);
                       openAddModal({ date: cell.fullDate, time: '08:00' });
                     }}
-                    className="w-4 h-4 rounded-md flex items-center justify-center text-[#8D5B4C] hover:bg-[#8D5B4C] hover:text-white transition-all opacity-0 group-hover:opacity-100"
-                    title={`Thêm lịch ngày ${cell.day}`}
+                    className="w-full h-full min-h-[58px] rounded-xl border border-dashed border-[#D9C8B5] hover:border-[#8D5B4C] bg-[#FAF7F2]/50 hover:bg-[#8D5B4C]/10 flex flex-col items-center justify-center gap-1.5 text-[#8D5B4C] opacity-0 group-hover:opacity-100 transition-all duration-200 transform scale-95 group-hover:scale-100 cursor-pointer group/add"
+                    title={`Bấm để lên lịch hẹn cho ngày ${cell.day}`}
                   >
-                    <Plus className="w-3 h-3" />
+                    <div className="w-7 h-7 rounded-full bg-white shadow-xs border border-[#E5DCD0] flex items-center justify-center transition-all group-hover/add:bg-[#8D5B4C] group-hover/add:border-[#8D5B4C]">
+                      <Plus className="w-4 h-4 text-[#8D5B4C] group-hover/add:text-white transition-colors" />
+                    </div>
+                    <span className="text-[11px] font-semibold text-[#8D5B4C]">
+                      + Thêm lịch
+                    </span>
                   </button>
                 </div>
-              </div>
+              ) : (
+                <div className="flex-1 space-y-1 overflow-y-auto max-h-[85px] pr-0.5">
+                  {bookings.map((booking) => {
+                    const isSelected = selectedCustomerId === booking.id;
 
-              {/* Bookings inside cell matching Image 2 */}
-              <div className="flex-1 space-y-1 overflow-y-auto max-h-[85px] pr-0.5">
-                {bookings.map((booking) => {
-                  const isSelected = selectedCustomerId === booking.id;
-
-                  return (
-                    <button
-                      key={booking.id}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedCustomerId(booking.id);
-                        setSelectedDate(booking.date);
-                      }}
-                      className={getCardStyle(booking.category, isSelected)}
-                      title={`${booking.name} (${booking.categoryName}) - ${booking.time}`}
-                    >
-                      <div className="flex items-center gap-1.5 leading-tight">
-                        <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${getDotColor(booking.category)}`} />
-                        <span className="font-semibold text-truncate">{booking.name}</span>
-                      </div>
-                      <div className="text-[10px] opacity-80 pl-3">
-                        {booking.categoryName} | {booking.time}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
+                    return (
+                      <button
+                        key={booking.id}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedCustomerId(booking.id);
+                          setSelectedDate(booking.date);
+                        }}
+                        className={getCardStyle(booking.category, isSelected)}
+                        title={`${booking.name} (${booking.categoryName}) - ${booking.time}`}
+                      >
+                        <div className="flex items-center gap-1.5 leading-tight">
+                          <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${getDotColor(booking.category)}`} />
+                          <span className="font-semibold text-truncate">{booking.name}</span>
+                        </div>
+                        <div className="text-[10px] opacity-80 pl-3">
+                          {booking.categoryName} | {booking.time}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           );
         })}

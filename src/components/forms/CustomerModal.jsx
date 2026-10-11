@@ -143,7 +143,7 @@ export default function CustomerModal() {
         <div className="flex items-center justify-between p-6 border-b border-[#EFE8DE] sticky top-0 bg-white z-10">
           <div>
             <h3 className="text-lg font-bold font-serif text-[#2C2420]">
-              {editingCustomer ? 'Sửa thông tin khách hàng' : 'Thêm khách mới'}
+              {(editingCustomer && !editingCustomer._isNew) ? 'Sửa thông tin khách hàng' : 'Thêm lịch hẹn mới'}
             </h3>
             <p className="text-xs text-[#8C7E74]">MEYZI STUDIO MAKEUP & HAIR</p>
           </div>
