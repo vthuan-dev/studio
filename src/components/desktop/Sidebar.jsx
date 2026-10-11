@@ -60,11 +60,12 @@ export default function Sidebar() {
     } else if (id === 'kho-phu-kien') {
       setIsAccessoriesModalOpen(true);
     } else if (id === 'lich-khach') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const mainEl = document.querySelector('main');
+      if (mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
       showToast('Đã chuyển sang xem Lịch hẹn');
     } else if (id === 'danh-sach') {
-      const el = document.querySelector('table');
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
+      const tableEl = document.querySelector('table');
+      if (tableEl) tableEl.scrollIntoView({ behavior: 'smooth' });
       showToast('Đã cuộn đến Danh sách khách hàng');
     } else if (id === 'da-coc') {
       showToast('Đang lọc danh sách: Khách đã cọc');
@@ -75,7 +76,7 @@ export default function Sidebar() {
 
 
   return (
-    <aside className="w-64 bg-[#FAF7F2] border-r border-[#EFE8DE] flex flex-col flex-shrink-0 min-h-screen py-6 px-4">
+    <aside className="w-64 bg-[#FAF7F2] border-r border-[#EFE8DE] flex flex-col flex-shrink-0 h-full overflow-y-auto py-6 px-4 select-none">
       {/* Brand Logo matching Image 2 */}
       <div className="pb-7 border-b border-[#EFE8DE]/80 flex justify-center">
         <BrandLogo size="lg" layout="vertical" />

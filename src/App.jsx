@@ -50,19 +50,19 @@ function StudioApp() {
         )
       ) : (
         /* Desktop Web Dashboard (matching Image 2) */
-        <div className="min-h-screen flex bg-[#FAF7F2] text-[#2C2420]">
+        <div className="h-screen w-full overflow-hidden flex bg-[#FAF7F2] text-[#2C2420]">
           {/* Left Sidebar matching Image 2 */}
           <Sidebar />
 
           {/* Main Workspace */}
-          <div className="flex-1 flex flex-col min-w-0 min-h-screen overflow-x-hidden">
+          <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
             {/* Top Header */}
             <TopHeader />
 
             {/* Content Body */}
-            <div className="flex-1 flex overflow-hidden">
-              {/* Center Calendar and Table */}
-              <main className="flex-1 p-6 overflow-y-auto max-w-[1600px]">
+            <div className="flex-1 flex overflow-hidden min-h-0">
+              {/* Center Calendar and Table - Only this scrolls */}
+              <main className="flex-1 p-6 overflow-y-auto h-full max-w-[1600px]">
                 {/* Calendar View */}
                 <CalendarGrid />
 

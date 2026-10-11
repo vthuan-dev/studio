@@ -96,7 +96,7 @@ export default function TopHeader() {
   };
 
   return (
-    <header className="h-20 bg-[#FAF7F2] border-b border-[#EFE8DE] px-8 flex items-center justify-between gap-4 select-none relative z-20">
+    <header className="h-20 bg-[#FAF7F2] border-b border-[#EFE8DE] px-8 flex items-center justify-between gap-4 select-none flex-shrink-0 z-20">
       {/* Left: Date navigation matching Image 2 */}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1 bg-[#F5EFE6] p-1 rounded-xl border border-[#E5DCD0]">
