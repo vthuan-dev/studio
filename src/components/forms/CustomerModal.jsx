@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Camera, Sparkles, User, Calendar, Clock, DollarSign, Check } from 'lucide-react';
+import { X, Sparkles, User, Calendar, Clock, DollarSign, Check } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 import { STAFFS } from '../../data/mockData';
 import VietnamAddressSelect from './VietnamAddressSelect';
@@ -25,8 +25,7 @@ export default function CustomerModal() {
     staffHair: 'Khánh Vy',
     totalAmount: 3200000,
     depositAmount: 1000000,
-    note: 'Tone nhẹ nhàng, trong trẻo. Có thuê phụ kiện.',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
+    note: 'Tone nhẹ nhàng, trong trẻo. Có thuê phụ kiện.'
   });
 
   useEffect(() => {
@@ -43,8 +42,7 @@ export default function CustomerModal() {
         staffHair: editingCustomer.staffHair || 'Khánh Vy',
         totalAmount: editingCustomer.totalAmount || 0,
         depositAmount: editingCustomer.depositAmount || 0,
-        note: editingCustomer.note || '',
-        avatar: editingCustomer.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
+        note: editingCustomer.note || ''
       });
     } else if (editingCustomer && editingCustomer._isNew) {
       setFormData({
@@ -59,8 +57,7 @@ export default function CustomerModal() {
         staffHair: 'Khánh Vy',
         totalAmount: 3200000,
         depositAmount: 1000000,
-        note: 'Tone nhẹ nhàng, trong trẻo. Có thuê phụ kiện.',
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
+        note: 'Tone nhẹ nhàng, trong trẻo. Có thuê phụ kiện.'
       });
     } else {
       setFormData({
@@ -75,8 +72,7 @@ export default function CustomerModal() {
         staffHair: 'Khánh Vy',
         totalAmount: 3200000,
         depositAmount: 1000000,
-        note: 'Tone nhẹ nhàng, trong trẻo. Có thuê phụ kiện.',
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
+        note: 'Tone nhẹ nhàng, trong trẻo. Có thuê phụ kiện.'
       });
     }
   }, [editingCustomer, isCustomerModalOpen]);
@@ -164,45 +160,32 @@ export default function CustomerModal() {
               Thông tin khách hàng
             </h4>
 
-            <div className="flex gap-4 items-center">
-              <div className="relative group cursor-pointer">
-                <img
-                  src={formData.avatar}
-                  alt="Avatar"
-                  className="w-16 h-16 rounded-full object-cover border-2 border-[#8D5B4C]/20 shadow-xs"
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[11px] font-semibold text-[#6C5F57] mb-1">
+                  Họ tên khách hàng *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="VD: Hồng Nhung"
+                  className="w-full bg-[#FAF7F2] border border-[#EFE8DE] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#8D5B4C]/20 font-medium"
                 />
-                <div className="absolute inset-0 bg-black/30 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Camera className="w-5 h-5 text-white" />
-                </div>
               </div>
-
-              <div className="flex-1 space-y-2">
-                <div>
-                  <label className="block text-[11px] font-semibold text-[#6C5F57] mb-1">
-                    Họ tên *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="VD: Hồng Nhung"
-                    className="w-full bg-[#FAF7F2] border border-[#EFE8DE] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#8D5B4C]/20 font-medium"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-semibold text-[#6C5F57] mb-1">
-                    Số điện thoại *
-                  </label>
-                  <input
-                    type="tel"
-                    required
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="VD: 0987 654 321"
-                    className="w-full bg-[#FAF7F2] border border-[#EFE8DE] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#8D5B4C]/20 font-medium"
-                  />
-                </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-[#6C5F57] mb-1">
+                  Số điện thoại *
+                </label>
+                <input
+                  type="tel"
+                  required
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  placeholder="VD: 0987 654 321"
+                  className="w-full bg-[#FAF7F2] border border-[#EFE8DE] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#8D5B4C]/20 font-medium"
+                />
               </div>
             </div>
 

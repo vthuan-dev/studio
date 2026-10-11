@@ -67,28 +67,20 @@ export default function CustomerDetailDrawer() {
     status,
     statusText,
     note,
-    avatar,
     paymentHistory
   } = selectedCustomer;
 
   return (
     <aside className="w-84 bg-white border-l border-[#EFE8DE] flex flex-col flex-shrink-0 h-full overflow-y-auto p-5 text-[#2C2420]">
       {/* Header matching Image 2 */}
-      <div className="flex items-start justify-between pb-3 border-b border-[#EFE8DE]">
-        <div>
-          <h2 className="text-xl font-bold font-serif text-[#2C2420] leading-snug">
-            {name}
-          </h2>
-          <div className="flex items-center gap-2 mt-1.5">
-            <ServiceBadge category={category} text={categoryName} size="xs" />
-            <StatusBadge status={status} text={statusText} size="xs" />
-          </div>
+      <div className="pb-3 border-b border-[#EFE8DE]">
+        <h2 className="text-xl font-bold font-serif text-[#2C2420] leading-snug">
+          {name}
+        </h2>
+        <div className="flex items-center gap-2 mt-2">
+          <ServiceBadge category={category} text={categoryName} size="xs" />
+          <StatusBadge status={status} text={statusText} size="xs" />
         </div>
-        <img
-          src={avatar}
-          alt={name}
-          className="w-12 h-12 rounded-full object-cover ring-2 ring-[#8D5B4C]/20 shadow-xs"
-        />
       </div>
 
       {/* Info list with clean icons */}

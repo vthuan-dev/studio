@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, UserCheck, Calendar, Phone, Award } from 'lucide-react';
+import { X, UserCheck, Calendar, Phone, Award, User } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 import { STAFFS } from '../../data/mockData';
 
@@ -59,11 +59,9 @@ export default function StaffModal() {
                 className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#EFE8DE] flex items-center justify-between hover:border-[#8D5B4C]/40 transition-colors"
               >
                 <div className="flex items-center gap-3.5">
-                  <img
-                    src={staff.avatar}
-                    alt={staff.name}
-                    className="w-12 h-12 rounded-full object-cover ring-2 ring-[#8D5B4C]/20 shadow-xs"
-                  />
+                  <div className="w-10 h-10 rounded-full bg-[#F5EFE6] border border-[#E5DCD0] flex items-center justify-center text-[#8D5B4C] flex-shrink-0">
+                    <User className="w-5 h-5" />
+                  </div>
                   <div>
                     <h4 className="font-bold text-sm text-[#2C2420]">{staff.name}</h4>
                     <p className="text-[11px] text-[#8D5B4C] font-semibold">{staff.role}</p>

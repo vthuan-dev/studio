@@ -89,23 +89,16 @@ export default function MobileListView() {
               onClick={() => handleSelect(c.id)}
               className="bg-white p-3.5 rounded-2xl border border-[#EFE8DE] shadow-xs flex items-center justify-between cursor-pointer hover:border-[#8D5B4C]/40 transition-all"
             >
-              <div className="flex items-center gap-3">
-                <img
-                  src={c.avatar}
-                  alt={c.name}
-                  className="w-11 h-11 rounded-full object-cover ring-1 ring-[#8D5B4C]/20"
-                />
-                <div>
-                  <div className="font-bold text-xs text-[#2C2420] flex items-center gap-1.5">
-                    {c.name}
-                    <ServiceBadge category={c.category} text={c.categoryName} size="xs" />
-                  </div>
-                  <div className="text-[10px] text-[#8C7E74] mt-0.5">
-                    {c.phone} • {c.date} ({c.time})
-                  </div>
-                  <div className="text-[10px] text-[#5A4F48] mt-0.5 line-clamp-1">
-                    {c.services?.join(', ')}
-                  </div>
+              <div>
+                <div className="font-bold text-xs text-[#2C2420] flex items-center gap-1.5">
+                  {c.name}
+                  <ServiceBadge category={c.category} text={c.categoryName} size="xs" />
+                </div>
+                <div className="text-[10px] text-[#8C7E74] mt-0.5">
+                  {c.phone} • {c.date} ({c.time})
+                </div>
+                <div className="text-[10px] text-[#5A4F48] mt-0.5 line-clamp-1">
+                  {c.services?.join(', ')}
                 </div>
               </div>
 

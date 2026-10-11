@@ -53,7 +53,6 @@ export default function MobileDetailView() {
     remainingAmount,
     statusText,
     note,
-    avatar,
     paymentHistory
   } = selectedCustomer;
 
@@ -81,22 +80,15 @@ export default function MobileDetailView() {
       <div className="flex-1 overflow-y-auto p-4 space-y-3.5">
         {/* Customer Header Card */}
         <div className="bg-white p-4 rounded-2xl border border-[#EFE8DE] flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img
-              src={avatar}
-              alt={name}
-              className="w-14 h-14 rounded-full object-cover ring-2 ring-[#8D5B4C]/20 shadow-xs"
-            />
-            <div>
-              <h2 className="text-base font-bold text-[#2C2420]">{name}</h2>
-              <div className="flex items-center gap-1.5 mt-1">
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#FFEBEE] text-[#C62828] border border-[#FFCDD2]">
-                  {categoryName}
-                </span>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#E8F5E9] text-[#2E7D32] border border-[#C8E6C9]">
-                  {statusText}
-                </span>
-              </div>
+          <div>
+            <h2 className="text-base font-bold text-[#2C2420]">{name}</h2>
+            <div className="flex items-center gap-1.5 mt-1">
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#FFEBEE] text-[#C62828] border border-[#FFCDD2]">
+                {categoryName}
+              </span>
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#E8F5E9] text-[#2E7D32] border border-[#C8E6C9]">
+                {statusText}
+              </span>
             </div>
           </div>
 

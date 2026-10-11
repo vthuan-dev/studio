@@ -101,7 +101,6 @@ Yêu cầu: ${cust.note || 'Đến đúng giờ'}. Studio rất hân hạnh đư
               {unDeposited.map(c => (
                 <div key={c.id} className="p-3 rounded-2xl bg-[#FFF8F8] border border-[#FFCDD2] flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <img src={c.avatar} alt={c.name} className="w-9 h-9 rounded-full object-cover" />
                     <div>
                       <div className="font-bold text-xs text-[#2C2420]">{c.name}</div>
                       <div className="text-[10px] text-[#8C7E74]">{c.phone} • Ngày: {c.date} ({c.time})</div>
@@ -152,7 +151,6 @@ Yêu cầu: ${cust.note || 'Đến đúng giờ'}. Studio rất hân hạnh đư
               {withDebt.slice(0, 4).map(c => (
                 <div key={c.id} className="p-3 rounded-2xl bg-[#FAF7F2] border border-[#EFE8DE] flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <img src={c.avatar} alt={c.name} className="w-9 h-9 rounded-full object-cover" />
                     <div>
                       <div className="font-bold text-xs text-[#2C2420]">{c.name}</div>
                       <div className="text-[10px] text-[#8C7E74]">{c.phone} • {c.date} ({c.time})</div>

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { ChevronLeft, Camera, Calendar, Clock, Check } from 'lucide-react';
+import { ChevronLeft, Calendar, Clock, Check, User } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 
 export default function MobileAddCustomer() {
   const { setMobileScreen, addCustomer } = useStudio();
 
   const [formData, setFormData] = useState({
-    name: 'Hồng Nhung',
-    phone: '0987 654 321',
-    address: 'Thường Tín, Hà Nội',
+    name: '',
+    phone: '',
+    address: 'Hà Nội',
     date: '2026-11-05',
     time: '06:00',
     category: 'co-dau',
@@ -17,8 +17,7 @@ export default function MobileAddCustomer() {
     staffHair: 'Khánh Vy',
     totalAmount: 3200000,
     depositAmount: 1000000,
-    note: 'Tone nhẹ nhàng, trong trẻo. Có thuê phụ kiện',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
+    note: 'Tone nhẹ nhàng, trong trẻo. Có thuê phụ kiện'
   });
 
   const remaining = Math.max(0, formData.totalAmount - formData.depositAmount);
@@ -80,31 +79,27 @@ export default function MobileAddCustomer() {
             Thông tin khách hàng
           </h3>
 
-          <div className="flex items-center gap-3">
-            <div className="w-14 h-14 rounded-full bg-[#F5EFE6] border border-[#E5DCD0] flex items-center justify-center text-[#8C7E74]">
-              <Camera className="w-6 h-6 text-[#8D5B4C]" />
+          <div className="space-y-2.5">
+            <div>
+              <label className="text-[10px] text-[#8C7E74] font-medium block mb-1">Họ tên khách hàng *</label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="VD: Hồng Nhung"
+                className="w-full bg-[#FAF7F2] border border-[#EFE8DE] rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none"
+              />
             </div>
 
-            <div className="flex-1 space-y-2">
-              <div>
-                <label className="text-[10px] text-[#8C7E74] font-medium block">Họ tên *</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full bg-[#FAF7F2] border border-[#EFE8DE] rounded-xl px-2.5 py-1.5 text-xs font-semibold focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="text-[10px] text-[#8C7E74] font-medium block">Số điện thoại *</label>
-                <input
-                  type="text"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full bg-[#FAF7F2] border border-[#EFE8DE] rounded-xl px-2.5 py-1.5 text-xs font-semibold focus:outline-none"
-                />
-              </div>
+            <div>
+              <label className="text-[10px] text-[#8C7E74] font-medium block mb-1">Số điện thoại *</label>
+              <input
+                type="text"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="VD: 0987 654 321"
+                className="w-full bg-[#FAF7F2] border border-[#EFE8DE] rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none"
+              />
             </div>
           </div>
         </div>
@@ -169,11 +164,9 @@ export default function MobileAddCustomer() {
           <h3 className="font-bold text-xs text-[#2C2420]">Phân công nhân viên</h3>
           <div className="grid grid-cols-2 gap-2">
             <div className="flex items-center gap-2 bg-[#FAF7F2] p-2 rounded-xl border border-[#EFE8DE]">
-              <img
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
-                alt="Tuyết Mai"
-                className="w-8 h-8 rounded-full object-cover"
-              />
+              <div className="w-8 h-8 rounded-full bg-[#8D5B4C]/10 flex items-center justify-center text-[#8D5B4C] flex-shrink-0">
+                <User className="w-4 h-4" />
+              </div>
               <div>
                 <div className="text-[11px] font-bold">Tuyết Mai</div>
                 <div className="text-[9px] text-[#8C7E74]">Makeup</div>
@@ -181,11 +174,9 @@ export default function MobileAddCustomer() {
             </div>
 
             <div className="flex items-center gap-2 bg-[#FAF7F2] p-2 rounded-xl border border-[#EFE8DE]">
-              <img
-                src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80"
-                alt="Khánh Vy"
-                className="w-8 h-8 rounded-full object-cover"
-              />
+              <div className="w-8 h-8 rounded-full bg-[#8D5B4C]/10 flex items-center justify-center text-[#8D5B4C] flex-shrink-0">
+                <User className="w-4 h-4" />
+              </div>
               <div>
                 <div className="text-[11px] font-bold">Khánh Vy</div>
                 <div className="text-[9px] text-[#8C7E74]">Làm tóc</div>

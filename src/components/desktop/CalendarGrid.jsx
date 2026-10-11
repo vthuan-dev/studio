@@ -221,7 +221,6 @@ export default function CalendarGrid() {
                         } ${getCardStyle(c.category, false)}`}
                       >
                         <div className="flex items-center gap-3">
-                          <img src={c.avatar} alt={c.name} className="w-10 h-10 rounded-full object-cover ring-1 ring-[#8D5B4C]/20" />
                           <div>
                             <div className="font-bold text-xs flex items-center gap-2 text-[#2C2420]">
                               <span>{c.name}</span>

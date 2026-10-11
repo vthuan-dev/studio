@@ -80,7 +80,6 @@ export default function RevenueStatsModal() {
               {debtors.map((c) => (
                 <div key={c.id} className="p-3 flex items-center justify-between hover:bg-[#FAF7F2]/60">
                   <div className="flex items-center gap-2.5">
-                    <img src={c.avatar} alt={c.name} className="w-7 h-7 rounded-full object-cover" />
                     <div>
                       <span className="font-semibold text-[#2C2420]">{c.name}</span>
                       <span className="text-[10px] text-[#8C7E74] ml-2">({c.phone})</span>

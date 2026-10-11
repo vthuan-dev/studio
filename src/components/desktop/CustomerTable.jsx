@@ -208,16 +208,9 @@ export default function CustomerTable() {
                     </td>
 
                     <td className="py-3.5 px-3">
-                      <div className="flex items-center gap-2.5">
-                        <img
-                          src={c.avatar}
-                          alt={c.name}
-                          className="w-8 h-8 rounded-full object-cover ring-1 ring-[#8D5B4C]/20"
-                        />
-                        <span className="font-semibold text-[#2C2420]">
-                          {c.name}
-                        </span>
-                      </div>
+                      <span className="font-semibold text-[#2C2420]">
+                        {c.name}
+                      </span>
                     </td>
 
                     <td className="py-3.5 px-3 text-[#5A4F48]">

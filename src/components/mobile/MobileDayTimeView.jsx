@@ -44,8 +44,7 @@ export default function MobileDayTimeView() {
         service: 'Makeup + Làm tóc',
         status: 'da-coc',
         statusText: 'Đã cọc',
-        borderColor: 'border-[#F8D7DA]',
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
+        borderColor: 'border-[#F8D7DA]'
       }
     },
     { 
@@ -58,8 +57,7 @@ export default function MobileDayTimeView() {
         service: 'Makeup + Làm tóc',
         status: 'da-coc',
         statusText: 'Đã cọc',
-        borderColor: 'border-[#C3E6CB]',
-        avatar: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=150&auto=format&fit=crop&q=80'
+        borderColor: 'border-[#C3E6CB]'
       }
     },
     { 
@@ -72,8 +70,7 @@ export default function MobileDayTimeView() {
         service: 'Makeup',
         status: 'chua-coc',
         statusText: 'Chưa cọc',
-        borderColor: 'border-[#F8D7DA]',
-        avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&auto=format&fit=crop&q=80'
+        borderColor: 'border-[#F8D7DA]'
       }
     },
     { 
@@ -86,8 +83,7 @@ export default function MobileDayTimeView() {
         service: 'Makeup + Làm tóc',
         status: 'chua-coc',
         statusText: 'Chưa cọc',
-        borderColor: 'border-[#F8D7DA]',
-        avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80'
+        borderColor: 'border-[#F8D7DA]'
       }
     },
     { time: '10:00', customer: null },
@@ -102,8 +98,7 @@ export default function MobileDayTimeView() {
         service: 'Makeup + Làm tóc',
         status: 'da-coc',
         statusText: 'Đã cọc',
-        borderColor: 'border-[#E2D9F3]',
-        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80'
+        borderColor: 'border-[#E2D9F3]'
       }
     },
     { time: '14:00', customer: null },
@@ -188,25 +183,18 @@ export default function MobileDayTimeView() {
                   onClick={() => handleSelectCustomer(slot.customer)}
                   className={`bg-white p-3 rounded-2xl border ${slot.customer.borderColor} shadow-xs flex items-center justify-between cursor-pointer hover:shadow-sm transition-all`}
                 >
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={slot.customer.avatar}
-                      alt={slot.customer.name}
-                      className="w-10 h-10 rounded-full object-cover ring-1 ring-[#8D5B4C]/20"
-                    />
-                    <div>
-                      <div className="font-bold text-xs text-[#2C2420]">
-                        {slot.customer.name}{' '}
-                        <span className="font-normal text-[#8C7E74]">
-                          ({slot.customer.type})
-                        </span>
-                      </div>
-                      <div className="text-[10px] text-[#8C7E74] mt-0.5">
-                        {slot.customer.phone}
-                      </div>
-                      <div className="text-[10px] text-[#5A4F48] font-medium mt-0.5">
-                        {slot.customer.service}
-                      </div>
+                  <div>
+                    <div className="font-bold text-xs text-[#2C2420]">
+                      {slot.customer.name}{' '}
+                      <span className="font-normal text-[#8C7E74]">
+                        ({slot.customer.type})
+                      </span>
+                    </div>
+                    <div className="text-[10px] text-[#8C7E74] mt-0.5">
+                      {slot.customer.phone}
+                    </div>
+                    <div className="text-[10px] text-[#5A4F48] font-medium mt-0.5">
+                      {slot.customer.service}
                     </div>
                   </div>
 

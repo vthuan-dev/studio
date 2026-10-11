@@ -5,20 +5,17 @@ export const STAFFS = [
   { 
     id: 'tuyet-mai', 
     name: 'Tuyết Mai', 
-    role: 'Makeup Artist',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
+    role: 'Makeup Artist'
   },
   { 
     id: 'khanh-vy', 
     name: 'Khánh Vy', 
-    role: 'Làm tóc (Hair Stylist)',
-    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80'
+    role: 'Làm tóc (Hair Stylist)'
   },
   { 
     id: 'lan-huong', 
     name: 'Lan Hương', 
-    role: 'Makeup Artist',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80'
+    role: 'Makeup Artist'
   }
 ];
 
@@ -50,7 +47,6 @@ export const INITIAL_CUSTOMERS = [
     status: 'da-coc', // da-coc, chua-coc, da-thanh-toan
     statusText: 'Đã cọc',
     note: 'Tone nhẹ nhàng, trong trẻo. Có thuê phụ kiện. Yêu cầu đến sớm 5:30',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
     paymentHistory: [
       { date: '05/10/2026', amount: 1000000, type: 'Đặt cọc' }
     ]
@@ -74,7 +70,6 @@ export const INITIAL_CUSTOMERS = [
     status: 'da-thanh-toan',
     statusText: 'Đã thanh toán',
     note: '-',
-    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
     paymentHistory: [
       { date: '10/10/2026', amount: 1000000, type: 'Đặt cọc' },
       { date: '18/11/2026', amount: 2000000, type: 'Thanh toán đủ' }
@@ -99,7 +94,6 @@ export const INITIAL_CUSTOMERS = [
     status: 'chua-coc',
     statusText: 'Chưa cọc',
     note: 'Liên hệ lại',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
     paymentHistory: []
   },
   {
@@ -121,7 +115,6 @@ export const INITIAL_CUSTOMERS = [
     status: 'da-coc',
     statusText: 'Đã cọc',
     note: 'Cần thuê phụ kiện',
-    avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&auto=format&fit=crop&q=80',
     paymentHistory: [
       { date: '12/10/2026', amount: 1000000, type: 'Đặt cọc' }
     ]
@@ -145,7 +138,6 @@ export const INITIAL_CUSTOMERS = [
     status: 'chua-coc',
     statusText: 'Chưa cọc',
     note: '-',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
     paymentHistory: []
   },
   {
@@ -167,7 +159,6 @@ export const INITIAL_CUSTOMERS = [
     status: 'da-coc',
     statusText: 'Đã cọc',
     note: 'Tone Tây cam đào',
-    avatar: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=150&auto=format&fit=crop&q=80',
     paymentHistory: [{ date: '01/10/2026', amount: 1500000, type: 'Đặt cọc' }]
   },
   {
@@ -189,7 +180,6 @@ export const INITIAL_CUSTOMERS = [
     status: 'da-coc',
     statusText: 'Đã cọc',
     note: 'Làm tại studio',
-    avatar: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=150&auto=format&fit=crop&q=80',
     paymentHistory: [{ date: '15/10/2026', amount: 1000000, type: 'Đặt cọc' }]
   },
   {
@@ -211,7 +201,6 @@ export const INITIAL_CUSTOMERS = [
     status: 'chua-coc',
     statusText: 'Chưa cọc',
     note: 'Khách đến studio lúc 9:45',
-    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
     paymentHistory: []
   },
   {
@@ -233,7 +222,6 @@ export const INITIAL_CUSTOMERS = [
     status: 'da-coc',
     statusText: 'Đã cọc',
     note: 'Concept nàng thơ ngoài trời',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
     paymentHistory: [{ date: '20/10/2026', amount: 1000000, type: 'Đặt cọc' }]
   },
   {
@@ -255,7 +243,6 @@ export const INITIAL_CUSTOMERS = [
     status: 'da-coc',
     statusText: 'Đã cọc',
     note: 'Làm tại nhà cô dâu',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
     paymentHistory: [{ date: '22/10/2026', amount: 1000000, type: 'Đặt cọc' }]
   },
   {
@@ -277,7 +264,6 @@ export const INITIAL_CUSTOMERS = [
     status: 'chua-coc',
     statusText: 'Chưa cọc',
     note: 'Cần hoàn thành trước 11:00',
-    avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&auto=format&fit=crop&q=80',
     paymentHistory: []
   },
   {
@@ -299,7 +285,6 @@ export const INITIAL_CUSTOMERS = [
     status: 'da-coc',
     statusText: 'Đã cọc',
     note: 'Mặc áo dài đỏ thêu hoa',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
     paymentHistory: [{ date: '25/10/2026', amount: 1500000, type: 'Đặt cọc' }]
   },
   {
@@ -321,7 +306,6 @@ export const INITIAL_CUSTOMERS = [
     status: 'da-thanh-toan',
     statusText: 'Đã thanh toán',
     note: 'Tone trong veo Hàn Quốc',
-    avatar: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=150&auto=format&fit=crop&q=80',
     paymentHistory: [{ date: '28/10/2026', amount: 1800000, type: 'Thanh toán đủ' }]
   },
   {
@@ -343,7 +327,6 @@ export const INITIAL_CUSTOMERS = [
     status: 'da-coc',
     statusText: 'Đã cọc',
     note: 'Đến đúng giờ',
-    avatar: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=150&auto=format&fit=crop&q=80',
     paymentHistory: [{ date: '01/11/2026', amount: 1000000, type: 'Đặt cọc' }]
   }
 ];
