@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 import MobileDrawer from './MobileDrawer';
+import BrandLogo from '../common/BrandLogo';
 
 export default function MobileMonthView() {
   const { 
@@ -76,14 +77,7 @@ export default function MobileMonthView() {
           <Menu className="w-5 h-5 text-[#2C2420]" />
         </button>
 
-        <div className="text-center">
-          <h1 className="font-brand font-bold text-base tracking-[0.15em] text-[#2C2420]">
-            MEYZI
-          </h1>
-          <p className="text-[8px] tracking-[0.2em] text-[#8D5B4C] uppercase font-semibold">
-            STUDIO MAKEUP & HAIR
-          </p>
-        </div>
+        <BrandLogo size="sm" layout="horizontal" />
 
         <button 
           onClick={() => setIsNotificationOpen(true)}

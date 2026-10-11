@@ -1,8 +1,11 @@
-# studio
+<div align="center">
+  <img src="public/favicon.svg" width="84" height="84" alt="MEYZI STUDIO Logo" />
+  <h1>MEYZI STUDIO MAKEUP & HAIR</h1>
+  <p><strong>Hệ Thống Quản Lý Lịch Hẹn, Tiền Cọc & Công Nợ Khách Hàng</strong></p>
+  <p><em>Dành riêng cho Studio Makeup, Áo Cưới & Chăm Sóc Sắc Đẹp Chuyên Nghiệp</em></p>
+</div>
 
-# MEYZI STUDIO - Makeup & Hair | Hệ Thống Quản Lý Lịch Hẹn & Khách Hàng
-
-Hệ thống quản lý lịch hẹn, theo dõi công nợ, tiền cọc và khách hàng chuyên nghiệp dành cho Studio Makeup & Hair.
+---
 
 ## 🌟 Tính năng chính
 - **Lịch khách linh hoạt**: Xem lịch theo Tháng, Tuần (7 ngày & phân bổ khung giờ 06:00 - 18:00), Ngày chi tiết.

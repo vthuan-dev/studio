@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, Printer, Copy, Check, Sparkles } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
+import BrandLogo from './BrandLogo';
 
 export default function InvoiceModal() {
   const { isInvoiceModalOpen, setIsInvoiceModalOpen, selectedCustomer, showToast } = useStudio();
@@ -80,14 +81,9 @@ Ghi chú: ${note || '-'}`;
         {/* Printable Invoice Container */}
         <div className="py-6 space-y-5">
           {/* Studio Brand Header */}
-          <div className="text-center pb-5 border-b border-[#EFE8DE]">
-            <h2 className="font-brand text-2xl font-bold tracking-[0.2em] text-[#2C2420]">
-              MEYZI
-            </h2>
-            <p className="text-[10px] tracking-[0.25em] text-[#8D5B4C] uppercase font-semibold mt-1">
-              STUDIO MAKEUP & HAIR
-            </p>
-            <p className="text-[11px] text-[#8C7E74] mt-1">
+          <div className="text-center pb-5 border-b border-[#EFE8DE] flex flex-col items-center">
+            <BrandLogo size="md" layout="vertical" />
+            <p className="text-[11px] text-[#8C7E74] mt-2 font-medium">
               PHIẾU XÁC NHẬN LỊCH HẸN & TIỀN CỌC
             </p>
           </div>

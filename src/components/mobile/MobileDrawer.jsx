@@ -17,6 +17,7 @@ import {
   FileText
 } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
+import BrandLogo from '../common/BrandLogo';
 
 export default function MobileDrawer({ isOpen, onClose }) {
   const { 
@@ -55,14 +56,7 @@ export default function MobileDrawer({ isOpen, onClose }) {
       <div className="relative w-72 max-w-[80%] bg-[#FAF7F2] h-full shadow-2xl flex flex-col p-5 z-10 text-[#2C2420]">
         {/* Header */}
         <div className="flex items-center justify-between pb-6 border-b border-[#EFE8DE]">
-          <div className="text-left">
-            <h2 className="font-brand text-xl font-bold tracking-[0.15em] text-[#2C2420]">
-              MEYZI
-            </h2>
-            <p className="text-[9px] tracking-[0.2em] text-[#8D5B4C] uppercase font-semibold">
-              STUDIO MAKEUP & HAIR
-            </p>
-          </div>
+          <BrandLogo size="md" layout="horizontal" />
           <button 
             onClick={onClose}
             className="p-1.5 rounded-full hover:bg-[#F2ECE1] text-[#8C7E74]"

@@ -14,6 +14,7 @@ import {
   RotateCcw
 } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
+import BrandLogo from '../common/BrandLogo';
 
 export default function Sidebar() {
   const { 
@@ -76,13 +77,8 @@ export default function Sidebar() {
   return (
     <aside className="w-64 bg-[#FAF7F2] border-r border-[#EFE8DE] flex flex-col flex-shrink-0 min-h-screen py-6 px-4">
       {/* Brand Logo matching Image 2 */}
-      <div className="flex flex-col items-center justify-center text-center pb-8 border-b border-[#EFE8DE]/80">
-        <h1 className="font-brand text-2xl font-bold tracking-[0.18em] text-[#2C2420]">
-          MEYZI
-        </h1>
-        <p className="text-[10px] tracking-[0.25em] text-[#8D5B4C] uppercase font-medium mt-1">
-          STUDIO MAKEUP & HAIR
-        </p>
+      <div className="pb-7 border-b border-[#EFE8DE]/80 flex justify-center">
+        <BrandLogo size="lg" layout="vertical" />
       </div>
 
       {/* Navigation List */}
