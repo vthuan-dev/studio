@@ -12,6 +12,7 @@ export default function CalendarGrid() {
     currentYear,
     currentMonth,
     calendarView,
+    highlightedSection,
     openAddModal,
     navigatePrev,
     navigateNext,
@@ -149,7 +150,12 @@ export default function CalendarGrid() {
     const dayCustomers = filteredCustomers.filter(c => c.date === selectedDate);
 
     return (
-      <div className="bg-white rounded-2xl border border-[#EFE8DE] p-6 shadow-xs animate-fade-in">
+      <div 
+        id="calendar-section" 
+        className={`bg-white rounded-2xl border border-[#EFE8DE] p-6 shadow-xs animate-fade-in transition-all ${
+          highlightedSection === 'calendar' ? 'highlight-pulse ring-2 ring-[#8D5B4C]' : ''
+        }`}
+      >
         {/* Day Header with controls */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-[#EFE8DE]">
           <div className="flex items-center gap-3">
@@ -267,7 +273,12 @@ export default function CalendarGrid() {
     const hours = ['06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
 
     return (
-      <div className="bg-white rounded-2xl border border-[#EFE8DE] shadow-xs overflow-hidden flex flex-col animate-fade-in">
+      <div 
+        id="calendar-section" 
+        className={`bg-white rounded-2xl border border-[#EFE8DE] shadow-xs overflow-hidden flex flex-col animate-fade-in transition-all ${
+          highlightedSection === 'calendar' ? 'highlight-pulse ring-2 ring-[#8D5B4C]' : ''
+        }`}
+      >
         {/* Top Week Nav Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border-b border-[#EFE8DE] bg-[#FAF7F2]/60 gap-3">
           <div className="flex items-center gap-3">
@@ -402,7 +413,12 @@ export default function CalendarGrid() {
 
   // 3. MONTH GRID: Default month view matching Image 2
   return (
-    <div className="bg-white rounded-2xl border border-[#EFE8DE] shadow-xs overflow-hidden flex flex-col animate-fade-in">
+    <div 
+      id="calendar-section" 
+      className={`bg-white rounded-2xl border border-[#EFE8DE] shadow-xs overflow-hidden flex flex-col animate-fade-in transition-all ${
+        highlightedSection === 'calendar' ? 'highlight-pulse ring-2 ring-[#8D5B4C]' : ''
+      }`}
+    >
       {/* Weekday headers */}
       <div className="grid grid-cols-7 border-b border-[#EFE8DE] bg-[#FAF7F2]/60 text-center">
         {weekDays.map((w, idx) => (

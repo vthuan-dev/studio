@@ -101,6 +101,16 @@ export function StudioProvider({ children }) {
   // Toast feedback
   const [toast, setToast] = useState({ message: '', type: 'success', isVisible: false });
 
+  // Section highlight pulse animation (UX attention feedback)
+  const [highlightedSection, setHighlightedSection] = useState(null); // 'calendar' | 'table'
+
+  const triggerHighlight = (section) => {
+    setHighlightedSection(section);
+    setTimeout(() => {
+      setHighlightedSection(null);
+    }, 1800);
+  };
+
   const showToast = (message, type = 'success') => {
     setToast({ message, type, isVisible: true });
     setTimeout(() => {
@@ -517,6 +527,8 @@ export function StudioProvider({ children }) {
         setSelectedStaff,
         selectedCategory,
         setSelectedCategory,
+        activeSidebarTab,
+        setActiveSidebarTab,
         searchTerm,
         setSearchTerm,
         viewMode: effectiveViewMode,
@@ -552,6 +564,8 @@ export function StudioProvider({ children }) {
         navigatePrev,
         navigateNext,
         navigateToday,
+        highlightedSection,
+        triggerHighlight,
         exportToCSV,
         exportBackupJSON,
         importBackupJSON,

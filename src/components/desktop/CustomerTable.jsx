@@ -29,6 +29,8 @@ export default function CustomerTable() {
     selectedCustomerId,
     setSelectedCustomerId,
     stats,
+    highlightedSection,
+    activeSidebarTab,
     setIsPaymentModalOpen,
     setIsInvoiceModalOpen,
     showToast
@@ -61,13 +63,30 @@ export default function CustomerTable() {
   ];
 
   return (
-    <div className="bg-white rounded-2xl border border-[#EFE8DE] shadow-xs p-6 mt-6">
+    <div 
+      id="customer-table-section" 
+      className={`bg-white rounded-2xl border border-[#EFE8DE] shadow-xs p-6 mt-6 transition-all ${
+        highlightedSection === 'table' ? 'highlight-pulse ring-2 ring-[#8D5B4C]' : ''
+      }`}
+    >
       {/* Top Header matching Image 2 */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-[#EFE8DE]">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <h2 className="text-lg font-bold text-[#2C2420]">
-            Danh sách khách hàng
-          </h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-bold text-[#2C2420]">
+              Danh sách khách hàng
+            </h2>
+            {activeSidebarTab === 'da-coc' && (
+              <span className="text-[11px] bg-[#E8F5E9] text-[#2E7D32] border border-[#C8E6C9] px-2 py-0.5 rounded-full font-semibold">
+                Đang lọc: Đã cọc ({filteredCustomers.length})
+              </span>
+            )}
+            {activeSidebarTab === 'chua-coc' && (
+              <span className="text-[11px] bg-[#FFEBEE] text-[#C62828] border border-[#FFCDD2] px-2 py-0.5 rounded-full font-semibold">
+                Đang lọc: Chưa cọc ({filteredCustomers.length})
+              </span>
+            )}
+          </div>
 
           {/* Category Tabs */}
           <div className="flex items-center gap-1.5 flex-wrap">
