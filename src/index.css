@@ -28,7 +28,8 @@
 }
 
 .font-brand {
-  font-family: 'Cinzel', Georgia, serif;
+  font-family: 'Bodoni Moda', 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  font-feature-settings: "kern" 1, "liga" 1;
 }
 
 .font-serif {
