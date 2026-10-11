@@ -188,11 +188,11 @@ export default function MobileDrawer({ isOpen, onClose }) {
               resetData();
               onClose();
             }}
-            title="Khôi phục lại dữ liệu gốc như trên ảnh mẫu"
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-[#8D5B4C] bg-[#F5EFE6] hover:bg-[#EFE5D8] rounded-xl border border-[#E5DCD0] transition-colors"
+            title="Xóa trắng toàn bộ dữ liệu lịch hẹn để bắt đầu nhập mới"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold text-[#8D5B4C] bg-[#F5EFE6] hover:bg-[#EFE5D8] rounded-xl border border-[#E5DCD0] transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>Đặt lại dữ liệu mẫu</span>
+            <span>Xóa trắng dữ liệu (Làm mới)</span>
           </button>
         </div>
       </div>

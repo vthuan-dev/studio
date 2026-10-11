@@ -4,18 +4,21 @@ import { STAFFS, SERVICE_CATEGORIES } from '../data/mockData';
 
 const StudioContext = createContext();
 
-const STORAGE_KEY = 'meyzi_studio_customers_v1';
+const STORAGE_KEY = 'meyzi_studio_customers_v3';
 
 export function StudioProvider({ children }) {
   // Customers list with JSON and localStorage persistence
   const [customers, setCustomers] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return JSON.parse(saved);
+      if (saved !== null) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
     } catch (e) {
       console.error('Failed to load localStorage', e);
     }
-    return initialCustomersJson;
+    return Array.isArray(initialCustomersJson) ? initialCustomersJson : [];
   });
 
   // On mount: fetch latest customers from JSON file via local API
@@ -23,7 +26,7 @@ export function StudioProvider({ children }) {
     fetch('/api/customers')
       .then(res => res.ok ? res.json() : null)
       .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
+        if (Array.isArray(data)) {
           setCustomers(data);
         }
       })
@@ -83,8 +86,8 @@ export function StudioProvider({ children }) {
   const [currentMonth, setCurrentMonth] = useState(11); // 1-12
   const [selectedDate, setSelectedDate] = useState('2026-11-05'); // Day highlighted in mockup
 
-  // Selected customer for side panel / detail view (Default: Hồng Nhung - cust-1)
-  const [selectedCustomerId, setSelectedCustomerId] = useState('cust-1');
+  // Selected customer for side panel / detail view
+  const [selectedCustomerId, setSelectedCustomerId] = useState(null);
 
   // Modals & Popups
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
@@ -346,9 +349,7 @@ export function StudioProvider({ children }) {
       setCustomers(prev => prev.filter(c => c.id !== id));
       if (selectedCustomerId === id) {
         const remaining = customers.filter(c => c.id !== id);
-        if (remaining.length > 0) {
-          setSelectedCustomerId(remaining[0].id);
-        }
+        setSelectedCustomerId(remaining.length > 0 ? remaining[0].id : null);
       }
     }
   };
@@ -487,13 +488,19 @@ export function StudioProvider({ children }) {
   };
 
   const resetData = () => {
-    if (confirm('Khôi phục dữ liệu gốc mẫu từ file JSON?')) {
-      setCustomers(initialCustomersJson);
-      setSelectedCustomerId('cust-1');
-      setCurrentYear(2026);
-      setCurrentMonth(11);
-      setSelectedDate('2026-11-05');
-      showToast('Đã đặt lại dữ liệu mẫu gốc!');
+    if (confirm('Bạn có chắc chắn muốn xóa trắng toàn bộ dữ liệu lịch hẹn để bắt đầu nhập mới?')) {
+      setCustomers([]);
+      setSelectedCustomerId(null);
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+      } catch (e) {}
+      fetch('/api/customers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify([])
+      }).catch(() => {});
+      showToast('Đã xóa trắng toàn bộ dữ liệu. Bạn có thể bắt đầu tạo lịch mới!', 'info');
     }
   };
 

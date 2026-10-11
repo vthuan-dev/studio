@@ -6,7 +6,8 @@ import {
   Trash2, 
   ChevronDown,
   DollarSign,
-  FileText
+  FileText,
+  Users
 } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 import { ServiceBadge, StatusBadge } from '../common/Badge';
@@ -296,8 +297,25 @@ export default function CustomerTable() {
               })
             ) : (
               <tr>
-                <td colSpan={11} className="py-8 text-center text-gray-400">
-                  Không tìm thấy khách hàng nào phù hợp với bộ lọc.
+                <td colSpan={11} className="py-12 text-center">
+                  <div className="flex flex-col items-center justify-center text-[#8C7E74]">
+                    <div className="w-12 h-12 rounded-full bg-[#FAF7F2] border border-[#E5DCD0] flex items-center justify-center mb-2.5 text-[#8D5B4C] shadow-xs">
+                      <Users className="w-6 h-6" />
+                    </div>
+                    <p className="text-sm font-semibold text-[#2C2420] mb-1">
+                      Chưa có khách hàng nào trong danh sách
+                    </p>
+                    <p className="text-xs text-[#8C7E74] mb-3">
+                      Dữ liệu đang trống. Hãy bắt đầu bằng cách thêm lịch hẹn đầu tiên của bạn!
+                    </p>
+                    <button
+                      onClick={() => openAddModal()}
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#8D5B4C] hover:bg-[#744537] text-white text-xs font-semibold rounded-xl shadow-xs transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>+ Thêm khách mới</span>
+                    </button>
+                  </div>
                 </td>
               </tr>
             )}

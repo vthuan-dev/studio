@@ -20,6 +20,7 @@ import { ServiceBadge, StatusBadge } from '../common/Badge';
 export default function CustomerDetailDrawer() {
   const { 
     selectedCustomer, 
+    openAddModal,
     openEditModal, 
     deleteCustomer, 
     setIsPaymentModalOpen,
@@ -29,10 +30,22 @@ export default function CustomerDetailDrawer() {
 
   if (!selectedCustomer) {
     return (
-      <div className="w-80 bg-white border-l border-[#EFE8DE] p-6 flex flex-col items-center justify-center text-center text-[#8C7E74]">
-        <User className="w-12 h-12 text-[#D9C8B5] mb-2" />
-        <p className="text-sm">Chọn một khách hàng để xem chi tiết</p>
-      </div>
+      <aside className="w-80 bg-white border-l border-[#EFE8DE] p-6 flex flex-col items-center justify-center text-center text-[#8C7E74] h-full select-none">
+        <div className="w-16 h-16 rounded-full bg-[#FAF7F2] border border-[#E5DCD0] flex items-center justify-center mb-3 text-[#8D5B4C] shadow-xs">
+          <Sparkles className="w-7 h-7" />
+        </div>
+        <h4 className="text-sm font-bold text-[#2C2420] mb-1">Chưa chọn khách hàng</h4>
+        <p className="text-xs text-[#8C7E74] max-w-[210px] mb-4">
+          Dữ liệu đang trống hoặc chưa chọn khách. Bấm nút dưới để tạo lịch hẹn mới.
+        </p>
+        <button
+          onClick={() => openAddModal()}
+          className="flex items-center gap-2 px-4 py-2.5 bg-[#8D5B4C] hover:bg-[#744537] text-white text-xs font-semibold rounded-xl shadow-xs transition-colors"
+        >
+          <PlusCircle className="w-4 h-4" />
+          <span>+ Thêm lịch hẹn mới</span>
+        </button>
+      </aside>
     );
   }
 

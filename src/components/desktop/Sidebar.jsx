@@ -159,15 +159,15 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Reset mock data button */}
+      {/* Reset/Clear data button */}
       <div className="pt-4 border-t border-[#EFE8DE] mt-auto">
         <button
           onClick={resetData}
-          title="Khôi phục lại dữ liệu gốc như trên ảnh mẫu"
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-[#8D5B4C] bg-[#F5EFE6] hover:bg-[#EFE5D8] rounded-lg transition-colors border border-[#E5DCD0]"
+          title="Xóa trắng toàn bộ dữ liệu lịch hẹn để bắt đầu nhập mới"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold text-[#8D5B4C] bg-[#F5EFE6] hover:bg-[#EFE5D8] rounded-xl transition-colors border border-[#E5DCD0]"
         >
           <RotateCcw className="w-3.5 h-3.5" />
-          <span>Đặt lại dữ liệu mẫu</span>
+          <span>Xóa trắng dữ liệu (Làm mới)</span>
         </button>
       </div>
     </aside>

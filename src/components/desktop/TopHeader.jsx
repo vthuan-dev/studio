@@ -399,7 +399,7 @@ export default function TopHeader() {
                   className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] text-[#8D5B4C] hover:bg-[#F5EFE6]"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
-                  <span>Khôi phục dữ liệu mẫu gốc</span>
+                  <span>Xóa trắng dữ liệu (Làm mới)</span>
                 </button>
               </div>
             </div>
