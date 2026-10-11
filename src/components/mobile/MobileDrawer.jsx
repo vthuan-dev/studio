@@ -184,19 +184,7 @@ export default function MobileDrawer({ isOpen, onClose }) {
         </nav>
 
         {/* Footer */}
-        <div className="pt-3 border-t border-[#EFE8DE] mt-auto space-y-2">
-          <button
-            onClick={() => {
-              resetData();
-              onClose();
-            }}
-            title="Xóa trắng toàn bộ dữ liệu lịch hẹn để bắt đầu nhập mới"
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold text-[#8D5B4C] bg-[#F5EFE6] hover:bg-[#EFE5D8] rounded-xl border border-[#E5DCD0] transition-colors"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span>Xóa trắng dữ liệu (Làm mới)</span>
-          </button>
-
+        <div className="pt-3 border-t border-[#EFE8DE] mt-auto">
           <button
             onClick={() => {
               logout();

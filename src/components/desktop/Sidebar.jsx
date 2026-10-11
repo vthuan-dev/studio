@@ -174,21 +174,12 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Reset/Clear data & Logout buttons */}
-      <div className="pt-3 border-t border-[#EFE8DE] mt-auto space-y-1.5">
-        <button
-          onClick={resetData}
-          title="Xóa trắng toàn bộ dữ liệu lịch hẹn để bắt đầu nhập mới"
-          className="w-full flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-semibold text-[#8D5B4C] bg-[#F5EFE6] hover:bg-[#EFE5D8] rounded-xl transition-colors border border-[#E5DCD0]"
-        >
-          <RotateCcw className="w-3.5 h-3.5" />
-          <span>Xóa trắng dữ liệu</span>
-        </button>
-
+      {/* Logout button */}
+      <div className="pt-3 border-t border-[#EFE8DE] mt-auto">
         <button
           onClick={logout}
           title="Đăng xuất khỏi tài khoản admin"
-          className="w-full flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-semibold text-[#C62828] hover:bg-[#FFEBEE] rounded-xl transition-colors border border-[#FFCDD2]/60"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold text-[#C62828] hover:bg-[#FFEBEE] rounded-xl transition-colors border border-[#FFCDD2]/60 cursor-pointer"
         >
           <LogOut className="w-3.5 h-3.5" />
           <span>Đăng xuất (admin)</span>

@@ -496,24 +496,13 @@ export default function TopHeader() {
                 </button>
               </div>
 
-              <div className="pt-2 border-t border-[#EFE8DE] space-y-1">
-                <button
-                  onClick={() => {
-                    resetData();
-                    setIsProfileOpen(false);
-                  }}
-                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] text-[#8D5B4C] hover:bg-[#F5EFE6]"
-                >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  <span>Xóa trắng dữ liệu (Làm mới)</span>
-                </button>
-
+              <div className="pt-2 border-t border-[#EFE8DE]">
                 <button
                   onClick={() => {
                     logout();
                     setIsProfileOpen(false);
                   }}
-                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] text-[#C62828] hover:bg-[#FFEBEE] font-semibold transition-colors"
+                  className="w-full flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs text-[#C62828] hover:bg-[#FFEBEE] font-semibold transition-colors"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   <span>Đăng xuất (admin)</span>

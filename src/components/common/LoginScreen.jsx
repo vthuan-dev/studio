@@ -47,11 +47,7 @@ export default function LoginScreen() {
     }, 200);
   };
 
-  const handleQuickFill = () => {
-    setUsername('admin');
-    setPassword('10102020');
-    setError('');
-  };
+
 
   return (
     <div className="min-h-screen w-full bg-[#FAF7F2] text-[#2C2420] flex items-center justify-center p-4 sm:p-6 relative overflow-hidden select-none">
@@ -148,23 +144,7 @@ export default function LoginScreen() {
             </div>
           </div>
 
-          {/* Quick-fill helper banner */}
-          <div className="pt-1 flex items-center justify-between text-[11px] bg-[#FAF7F2] px-3 py-2 rounded-xl border border-[#EFE8DE]">
-            <div className="text-[#8C7E74] truncate">
-              <span>TK: </span>
-              <strong className="text-[#2C2420]">admin</strong>
-              <span className="mx-1.5">•</span>
-              <span>MK: </span>
-              <strong className="text-[#2C2420]">10102020</strong>
-            </div>
-            <button
-              type="button"
-              onClick={handleQuickFill}
-              className="text-[#8D5B4C] hover:text-[#744537] font-semibold text-[11px] hover:underline flex-shrink-0 ml-2"
-            >
-              Điền nhanh
-            </button>
-          </div>
+
 
           {/* Submit Button */}
           <button
