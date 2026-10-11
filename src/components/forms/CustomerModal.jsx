@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Camera, Sparkles, User, Calendar, Clock, DollarSign, Check } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 import { STAFFS } from '../../data/mockData';
+import VietnamAddressSelect from './VietnamAddressSelect';
 
 export default function CustomerModal() {
   const {
@@ -205,18 +206,11 @@ export default function CustomerModal() {
               </div>
             </div>
 
-            <div>
-              <label className="block text-[11px] font-semibold text-[#6C5F57] mb-1">
-                Địa chỉ
-              </label>
-              <input
-                type="text"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                placeholder="VD: Thường Tín, Hà Nội"
-                className="w-full bg-[#FAF7F2] border border-[#EFE8DE] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#8D5B4C]/20"
-              />
-            </div>
+            {/* Địa chỉ khách hàng với API 34 Tỉnh/Thành sau sáp nhập */}
+            <VietnamAddressSelect
+              value={formData.address}
+              onChange={(newAddress) => setFormData({ ...formData, address: newAddress })}
+            />
           </div>
 
           {/* Ngày làm & Giờ */}
