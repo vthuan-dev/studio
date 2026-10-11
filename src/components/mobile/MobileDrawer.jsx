@@ -8,13 +8,7 @@ import {
   TrendingUp, 
   Settings, 
   RotateCcw,
-  Monitor,
-  LayoutDashboard,
-  Sparkles,
-  ShoppingBag,
-  Bell,
-  FileSpreadsheet,
-  FileText
+  Monitor
 } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 import BrandLogo from '../common/BrandLogo';
@@ -23,24 +17,84 @@ export default function MobileDrawer({ isOpen, onClose }) {
   const { 
     activeSidebarTab, 
     setActiveSidebarTab, 
+    stats,
     resetData, 
     setIsStatsModalOpen, 
+    setIsExportModalOpen,
     setMobileScreen,
     setViewMode,
-    setIsNotificationOpen,
-    setIsExportModalOpen,
-    setIsInvoiceModalOpen
+    showToast
   } = useStudio();
 
   if (!isOpen) return null;
 
-  const handleTabClick = (tabId, screen) => {
-    setActiveSidebarTab(tabId);
-    if (tabId === 'doanh-thu' || tabId === 'tong-quan') {
+  // Streamlined essential items identical to Desktop Sidebar
+  const navItems = [
+    { 
+      id: 'lich-khach', 
+      label: 'Lịch hẹn khách', 
+      icon: Calendar,
+      screen: 'calendar',
+      type: 'screen'
+    },
+    { 
+      id: 'danh-sach', 
+      label: 'Danh sách khách', 
+      icon: Users,
+      screen: 'list',
+      badge: stats.totalCustomers,
+      type: 'screen'
+    },
+    { 
+      id: 'da-coc', 
+      label: 'Khách đã cọc', 
+      icon: CheckCircle,
+      screen: 'list',
+      badge: stats.countDeposited,
+      badgeColor: 'bg-emerald-100 text-emerald-800 border border-emerald-200',
+      type: 'screen'
+    },
+    { 
+      id: 'chua-coc', 
+      label: 'Chưa cọc & Nợ', 
+      icon: AlertCircle,
+      screen: 'list',
+      badge: stats.countUnpaid,
+      badgeColor: 'bg-amber-100 text-amber-800 border border-amber-200',
+      type: 'screen'
+    },
+    { 
+      id: 'doanh-thu', 
+      label: 'Báo cáo doanh thu', 
+      icon: TrendingUp,
+      type: 'modal'
+    },
+    { 
+      id: 'cai-dat', 
+      label: 'Cài đặt & Sao lưu', 
+      icon: Settings,
+      type: 'modal'
+    },
+  ];
+
+  const handleItemClick = (item) => {
+    setActiveSidebarTab(item.id);
+
+    if (item.type === 'screen') {
+      if (item.screen) {
+        setMobileScreen(item.screen);
+      }
+      if (item.id === 'da-coc') {
+        showToast(`Đang lọc: ${stats.countDeposited} khách đã cọc`);
+      } else if (item.id === 'chua-coc') {
+        showToast(`Đang lọc: ${stats.countUnpaid} khách chưa cọc / nợ`);
+      }
+    } else if (item.id === 'doanh-thu') {
       setIsStatsModalOpen(true);
-    } else if (screen) {
-      setMobileScreen(screen);
+    } else if (item.id === 'cai-dat') {
+      setIsExportModalOpen(true);
     }
+
     onClose();
   };
 
@@ -48,128 +102,94 @@ export default function MobileDrawer({ isOpen, onClose }) {
     <div className="fixed inset-0 z-50 flex">
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity" 
+        className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity animate-fade-in" 
         onClick={onClose} 
       />
 
       {/* Drawer Content */}
-      <div className="relative w-72 max-w-[80%] bg-[#FAF7F2] h-full shadow-2xl flex flex-col p-5 z-10 text-[#2C2420]">
+      <div className="relative w-72 max-w-[85%] bg-[#FAF7F2] h-full shadow-2xl flex flex-col p-5 z-10 text-[#2C2420] animate-fade-in select-none">
         {/* Header */}
-        <div className="flex items-center justify-between pb-6 border-b border-[#EFE8DE]">
+        <div className="flex items-center justify-between pb-5 border-b border-[#EFE8DE]">
           <BrandLogo size="md" layout="horizontal" />
           <button 
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-[#F2ECE1] text-[#8C7E74]"
+            className="p-1.5 rounded-full hover:bg-[#F2ECE1] text-[#8C7E74] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Navigation list */}
-        <nav className="flex-1 py-4 space-y-1 overflow-y-auto text-xs">
-          <button
-            onClick={() => handleTabClick('lich-khach', 'calendar')}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#2C2420] hover:bg-[#F2ECE1]"
-          >
-            <Calendar className="w-4 h-4 text-[#8D5B4C]" />
-            <span>Lịch khách</span>
-          </button>
+        <nav className="flex-1 py-4 space-y-1.5 overflow-y-auto text-xs">
+          <div className="px-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-[#A3968A]">
+            Điều hướng nhanh
+          </div>
 
-          <button
-            onClick={() => handleTabClick('lich-gio', 'hourly')}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#2C2420] hover:bg-[#F2ECE1]"
-          >
-            <Calendar className="w-4 h-4 text-[#8D5B4C]" />
-            <span>Lịch theo giờ (05/11)</span>
-          </button>
+          {navItems.map((item, idx) => {
+            const Icon = item.icon;
+            const isActive = activeSidebarTab === item.id;
+            const isModalDivider = idx === 4;
 
-          <button
-            onClick={() => handleTabClick('danh-sach', 'list')}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#2C2420] hover:bg-[#F2ECE1]"
-          >
-            <Users className="w-4 h-4 text-[#8D5B4C]" />
-            <span>Danh sách khách hàng</span>
-          </button>
+            return (
+              <React.Fragment key={item.id}>
+                {isModalDivider && (
+                  <div className="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-[#A3968A] border-t border-[#EFE8DE]/70 mt-3">
+                    Tiện ích hệ thống
+                  </div>
+                )}
+                <button
+                  onClick={() => handleItemClick(item)}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[13px] font-medium transition-all text-left group ${
+                    isActive
+                      ? 'bg-[#8D5B4C] text-white shadow-xs font-semibold'
+                      : 'text-[#6C5F57] hover:bg-[#F2ECE1] hover:text-[#2C2420]'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <Icon className={`w-4 h-4 flex-shrink-0 transition-transform group-hover:scale-110 ${isActive ? 'text-white' : 'text-[#8D5B4C]'}`} />
+                    <span className="whitespace-nowrap">{item.label}</span>
+                  </div>
 
-          <button
-            onClick={() => handleTabClick('da-coc', 'list')}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#2C2420] hover:bg-[#F2ECE1]"
-          >
-            <CheckCircle className="w-4 h-4 text-[#2E7D32]" />
-            <span>Khách đã cọc</span>
-          </button>
+                  {item.badge !== undefined && (
+                    <span 
+                      className={`text-xs px-2 py-0.5 rounded-full font-bold transition-colors ${
+                        isActive 
+                          ? 'bg-white/20 text-white' 
+                          : (item.badgeColor || 'bg-[#EFE8DE] text-[#6C5F57]')
+                      }`}
+                    >
+                      {item.badge}
+                    </span>
+                  )}
+                </button>
+              </React.Fragment>
+            );
+          })}
 
-          <button
-            onClick={() => handleTabClick('chua-coc', 'list')}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#2C2420] hover:bg-[#F2ECE1]"
-          >
-            <AlertCircle className="w-4 h-4 text-[#C62828]" />
-            <span>Khách chưa cọc</span>
-          </button>
+          <div className="pt-2 border-t border-[#EFE8DE]/80 mt-3" />
 
-          <button
-            onClick={() => handleTabClick('doanh-thu', null)}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#2C2420] hover:bg-[#F2ECE1]"
-          >
-            <TrendingUp className="w-4 h-4 text-[#8D5B4C]" />
-            <span>Báo cáo doanh thu</span>
-          </button>
-
-          <button
-            onClick={() => {
-              setIsNotificationOpen(true);
-              onClose();
-            }}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#2C2420] hover:bg-[#F2ECE1]"
-          >
-            <Bell className="w-4 h-4 text-[#C62828]" />
-            <span>Nhắc lịch & Thông báo (3)</span>
-          </button>
-
-          <button
-            onClick={() => {
-              setIsExportModalOpen(true);
-              onClose();
-            }}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#2C2420] hover:bg-[#F2ECE1]"
-          >
-            <FileSpreadsheet className="w-4 h-4 text-[#2E7D32]" />
-            <span>Xuất Excel & Sao lưu dữ liệu</span>
-          </button>
-
-          <button
-            onClick={() => {
-              setIsInvoiceModalOpen(true);
-              onClose();
-            }}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-[#2C2420] hover:bg-[#F2ECE1]"
-          >
-            <FileText className="w-4 h-4 text-[#1565C0]" />
-            <span>In Phiếu Thu / Hóa đơn</span>
-          </button>
-
-          <div className="pt-2 border-t border-[#EFE8DE]" />
-
+          {/* Switch to Desktop View */}
           <button
             onClick={() => {
               setViewMode('desktop');
               onClose();
             }}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold text-[#8D5B4C] bg-[#F5EFE6] hover:bg-[#EFE5D8]"
+            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13px] font-semibold text-[#8D5B4C] bg-[#F5EFE6] hover:bg-[#EFE5D8] border border-[#E5DCD0]/70 transition-colors"
           >
-            <Monitor className="w-4 h-4" />
+            <Monitor className="w-4 h-4 text-[#8D5B4C]" />
             <span>Xem giao diện Desktop</span>
           </button>
         </nav>
 
         {/* Footer */}
-        <div className="pt-3 border-t border-[#EFE8DE] space-y-2">
+        <div className="pt-3 border-t border-[#EFE8DE] mt-auto">
           <button
             onClick={() => {
               resetData();
               onClose();
             }}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-[#8D5B4C] bg-[#F5EFE6] rounded-xl border border-[#E5DCD0]"
+            title="Khôi phục lại dữ liệu gốc như trên ảnh mẫu"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-[#8D5B4C] bg-[#F5EFE6] hover:bg-[#EFE5D8] rounded-xl border border-[#E5DCD0] transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Đặt lại dữ liệu mẫu</span>

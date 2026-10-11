@@ -13,7 +13,8 @@ import {
   Plus,
   RotateCcw,
   Check,
-  Sparkles
+  Sparkles,
+  Smartphone
 } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 import { STAFFS } from '../../data/mockData';
@@ -375,6 +376,17 @@ export default function TopHeader() {
                 >
                   <FileSpreadsheet className="w-4 h-4 text-[#2E7D32]" />
                   <span>Xuất Excel & Sao lưu</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setViewMode('mobile');
+                    setIsProfileOpen(false);
+                  }}
+                  className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[#8D5B4C] bg-[#F5EFE6] hover:bg-[#EFE5D8] font-semibold text-left transition-colors border border-[#E5DCD0]"
+                >
+                  <Smartphone className="w-4 h-4 text-[#8D5B4C]" />
+                  <span>Xem giao diện Mobile</span>
                 </button>
               </div>
 
