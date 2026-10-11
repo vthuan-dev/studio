@@ -46,7 +46,8 @@ export default function TopHeader() {
     navigateNext,
     navigateToday,
     userProfile,
-    updateUserProfile
+    updateUserProfile,
+    logout
   } = useStudio();
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -495,7 +496,7 @@ export default function TopHeader() {
                 </button>
               </div>
 
-              <div className="pt-2 border-t border-[#EFE8DE]">
+              <div className="pt-2 border-t border-[#EFE8DE] space-y-1">
                 <button
                   onClick={() => {
                     resetData();
@@ -505,6 +506,17 @@ export default function TopHeader() {
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   <span>Xóa trắng dữ liệu (Làm mới)</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    logout();
+                    setIsProfileOpen(false);
+                  }}
+                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] text-[#C62828] hover:bg-[#FFEBEE] font-semibold transition-colors"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Đăng xuất (admin)</span>
                 </button>
               </div>
             </div>

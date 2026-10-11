@@ -21,6 +21,7 @@ import StaffModal from './components/common/StaffModal';
 import ServicesModal from './components/common/ServicesModal';
 import AccessoriesModal from './components/common/AccessoriesModal';
 import Toast from './components/common/Toast';
+import LoginScreen from './components/common/LoginScreen';
 
 // Native edge-to-edge mobile app for real phones and mobile viewports (< 1024px)
 function NativeMobileApp() {
@@ -38,7 +39,17 @@ function NativeMobileApp() {
 }
 
 function StudioApp() {
-  const { viewMode, isMobileScreen, toast, showToast } = useStudio();
+  const { isAuthenticated, viewMode, isMobileScreen, toast, showToast } = useStudio();
+
+  // Authentication guard: Require login (tk: admin, mk: 10102020)
+  if (!isAuthenticated) {
+    return (
+      <>
+        <LoginScreen />
+        <Toast toast={toast} onClose={() => showToast('', 'info')} />
+      </>
+    );
+  }
 
   return (
     <>

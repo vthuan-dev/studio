@@ -91,7 +91,10 @@ export const defaultStudioContext = {
   allStaffWithAll: [{ id: 'all', name: 'Tất cả nhân viên', role: 'all' }],
   addStaff: () => {},
   updateStaff: () => {},
-  deleteStaff: () => {}
+  deleteStaff: () => {},
+  isAuthenticated: false,
+  login: () => ({ success: false }),
+  logout: () => {}
 };
 
 export const StudioContext = createContext(defaultStudioContext);

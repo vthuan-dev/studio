@@ -8,7 +8,8 @@ import {
   TrendingUp, 
   Settings, 
   RotateCcw,
-  Monitor
+  Monitor,
+  LogOut
 } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 import BrandLogo from '../common/BrandLogo';
@@ -23,7 +24,8 @@ export default function MobileDrawer({ isOpen, onClose }) {
     setIsExportModalOpen,
     setMobileScreen,
     setViewMode,
-    showToast
+    showToast,
+    logout
   } = useStudio();
 
   if (!isOpen) return null;
@@ -182,7 +184,7 @@ export default function MobileDrawer({ isOpen, onClose }) {
         </nav>
 
         {/* Footer */}
-        <div className="pt-3 border-t border-[#EFE8DE] mt-auto">
+        <div className="pt-3 border-t border-[#EFE8DE] mt-auto space-y-2">
           <button
             onClick={() => {
               resetData();
@@ -193,6 +195,18 @@ export default function MobileDrawer({ isOpen, onClose }) {
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Xóa trắng dữ liệu (Làm mới)</span>
+          </button>
+
+          <button
+            onClick={() => {
+              logout();
+              onClose();
+            }}
+            title="Đăng xuất khỏi tài khoản admin"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold text-[#C62828] bg-[#FFEBEE] hover:bg-[#FFCDD2] rounded-xl border border-[#FFCDD2] transition-colors"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Đăng xuất (admin)</span>
           </button>
         </div>
       </div>

@@ -92,6 +92,39 @@ export function StudioProvider({ children }) {
   }, [customers]);
 
 
+  // Authentication state (tk: admin, mk: 10102020)
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    try {
+      return localStorage.getItem('meyzi_studio_auth_v1') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const login = (username, password) => {
+    if (username?.trim() === 'admin' && password === '10102020') {
+      setIsAuthenticated(true);
+      try {
+        localStorage.setItem('meyzi_studio_auth_v1', 'true');
+      } catch (e) {
+        console.error('Failed to save auth to localStorage', e);
+      }
+      showToast('Đăng nhập thành công! Chào mừng Quản trị viên.', 'success');
+      return { success: true };
+    }
+    return { success: false, message: 'Tài khoản hoặc mật khẩu không chính xác!' };
+  };
+
+  const logout = () => {
+    setIsAuthenticated(false);
+    try {
+      localStorage.removeItem('meyzi_studio_auth_v1');
+    } catch (e) {
+      console.error('Failed to clear auth from localStorage', e);
+    }
+    showToast('Đã đăng xuất khỏi hệ thống.', 'info');
+  };
+
   // View settings & responsive detection
   const [isMobileScreen, setIsMobileScreen] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -699,7 +732,10 @@ export function StudioProvider({ children }) {
         allStaffWithAll,
         addStaff,
         updateStaff,
-        deleteStaff
+        deleteStaff,
+        isAuthenticated,
+        login,
+        logout
       }}
     >
       {children}
