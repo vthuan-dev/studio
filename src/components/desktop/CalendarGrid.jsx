@@ -425,7 +425,11 @@ export default function CalendarGrid() {
             <div
               key={idx}
               onClick={() => setSelectedDate(cell.fullDate)}
-              className={`min-h-[108px] p-2 border-b border-r border-[#EFE8DE] transition-colors relative flex flex-col ${
+              onDoubleClick={() => {
+                setSelectedDate(cell.fullDate);
+                setCalendarView('day');
+              }}
+              className={`min-h-[108px] p-2 border-b border-r border-[#EFE8DE] transition-colors relative flex flex-col group ${
                 idx % 7 === 6 ? 'border-r-0' : ''
               } ${
                 cell.isCurrentMonth ? 'bg-white' : 'bg-[#FAF7F2]/40'
@@ -449,11 +453,24 @@ export default function CalendarGrid() {
                   {cell.day}
                 </span>
 
-                {bookings.length > 0 && (
-                  <span className="text-[10px] text-[#A3968A] font-medium pr-1">
-                    {bookings.length} lịch
-                  </span>
-                )}
+                <div className="flex items-center gap-1">
+                  {bookings.length > 0 && (
+                    <span className="text-[10px] text-[#A3968A] font-medium pr-0.5">
+                      {bookings.length} lịch
+                    </span>
+                  )}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedDate(cell.fullDate);
+                      openAddModal({ date: cell.fullDate, time: '08:00' });
+                    }}
+                    className="w-4 h-4 rounded-md flex items-center justify-center text-[#8D5B4C] hover:bg-[#8D5B4C] hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                    title={`Thêm lịch ngày ${cell.day}`}
+                  >
+                    <Plus className="w-3 h-3" />
+                  </button>
+                </div>
               </div>
 
               {/* Bookings inside cell matching Image 2 */}
