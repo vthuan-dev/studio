@@ -14,7 +14,7 @@ import {
   RotateCcw,
   Check,
   Sparkles,
-  Smartphone
+  Edit3
 } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 import { STAFFS } from '../../data/mockData';
@@ -40,12 +40,30 @@ export default function TopHeader() {
     showToast,
     navigatePrev,
     navigateNext,
-    navigateToday
+    navigateToday,
+    userProfile,
+    updateUserProfile
   } = useStudio();
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMonthPickerOpen, setIsMonthPickerOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    name: userProfile?.name || 'Tuyết Mai',
+    role: userProfile?.role || 'Chủ Studio / Makeup Artist',
+    branch: userProfile?.branch || 'Chi nhánh Hà Nội'
+  });
+
+  useEffect(() => {
+    if (userProfile) {
+      setProfileForm({
+        name: userProfile.name,
+        role: userProfile.role,
+        branch: userProfile.branch
+      });
+    }
+  }, [userProfile]);
 
   const monthPickerRef = useRef(null);
   const profileRef = useRef(null);
@@ -301,36 +319,109 @@ export default function TopHeader() {
         {/* User Profile Dropdown Menu */}
         <div className="relative" ref={profileRef}>
           <div 
-            onClick={() => setIsProfileOpen(prev => !prev)}
-            className="flex items-center gap-2.5 pl-2 border-l border-[#EFE8DE] cursor-pointer group hover:opacity-90"
+            onClick={() => {
+              setIsProfileOpen(prev => !prev);
+              setIsEditingProfile(false);
+            }}
+            className="flex items-center gap-2.5 pl-2 border-l border-[#EFE8DE] cursor-pointer group hover:opacity-90 select-none"
             title="Hồ sơ tài khoản"
           >
-            <img
-              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
-              alt="Tuyết Mai"
-              className="w-9 h-9 rounded-full object-cover ring-2 ring-[#8D5B4C]/20 group-hover:ring-[#8D5B4C]/50 transition-all"
-            />
+            <div className="w-8 h-8 rounded-full bg-[#F5EFE6] border border-[#E5DCD0] flex items-center justify-center text-[#8D5B4C] group-hover:bg-[#8D5B4C] group-hover:text-white transition-colors shadow-2xs">
+              <User className="w-4 h-4" />
+            </div>
             <span className="text-sm font-semibold text-[#2C2420] hidden md:inline">
-              Tuyết Mai
+              {userProfile?.name || 'Tuyết Mai'}
             </span>
             <ChevronDown className={`w-3.5 h-3.5 text-[#8D5B4C] transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} />
           </div>
 
           {/* Profile Dropdown Popup */}
           {isProfileOpen && (
-            <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-xl border border-[#EFE8DE] p-4 z-50 animate-fade-in text-xs">
-              <div className="flex items-center gap-3 pb-3 border-b border-[#EFE8DE]">
-                <img
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
-                  alt="Tuyết Mai"
-                  className="w-11 h-11 rounded-full object-cover border"
-                />
-                <div>
-                  <h4 className="font-bold text-sm text-[#2C2420]">Tuyết Mai</h4>
-                  <p className="text-[11px] text-[#8D5B4C] font-semibold">Chủ Studio / Makeup Artist</p>
-                  <p className="text-[10px] text-[#8C7E74]">Chi nhánh Hà Nội</p>
+            <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-2xl shadow-xl border border-[#EFE8DE] p-4 z-50 animate-fade-in text-xs">
+              {/* Profile info section (Editable, no avatar) */}
+              {!isEditingProfile ? (
+                <div className="pb-3 border-b border-[#EFE8DE]">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-9 h-9 rounded-full bg-[#F5EFE6] border border-[#E5DCD0] flex items-center justify-center text-[#8D5B4C] flex-shrink-0">
+                        <User className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="font-bold text-sm text-[#2C2420] truncate">{userProfile?.name}</h4>
+                        <p className="text-[11px] text-[#8D5B4C] font-semibold truncate">{userProfile?.role}</p>
+                        <p className="text-[10px] text-[#8C7E74] truncate">{userProfile?.branch}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setProfileForm({ ...userProfile });
+                        setIsEditingProfile(true);
+                      }}
+                      className="p-1.5 rounded-lg hover:bg-[#FAF7F2] text-[#8D5B4C] hover:text-[#744537] transition-colors border border-[#EFE8DE] flex-shrink-0"
+                      title="Sửa thông tin hồ sơ"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="pb-3 border-b border-[#EFE8DE] space-y-2">
+                  <div className="flex items-center justify-between pb-1 border-b border-[#EFE8DE]/60">
+                    <span className="text-[11px] font-bold text-[#8D5B4C] uppercase tracking-wider">Chỉnh sửa hồ sơ</span>
+                    <span className="text-[10px] text-[#8C7E74]">(Đổi tên / cơ sở)</span>
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-[#8C7E74] block font-medium mb-0.5">Tên chủ studio / Quản lý *</label>
+                    <input
+                      type="text"
+                      value={profileForm.name}
+                      onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
+                      className="w-full bg-[#FAF7F2] border border-[#EFE8DE] rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#8D5B4C]"
+                      placeholder="VD: Tuyết Mai"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-[#8C7E74] block font-medium mb-0.5">Chức danh / Vị trí</label>
+                    <input
+                      type="text"
+                      value={profileForm.role}
+                      onChange={(e) => setProfileForm({ ...profileForm, role: e.target.value })}
+                      className="w-full bg-[#FAF7F2] border border-[#EFE8DE] rounded-lg px-2.5 py-1.5 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-[#8D5B4C]"
+                      placeholder="VD: Chủ Studio / Makeup Artist"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-[#8C7E74] block font-medium mb-0.5">Chi nhánh / Cơ sở</label>
+                    <input
+                      type="text"
+                      value={profileForm.branch}
+                      onChange={(e) => setProfileForm({ ...profileForm, branch: e.target.value })}
+                      className="w-full bg-[#FAF7F2] border border-[#EFE8DE] rounded-lg px-2.5 py-1.5 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-[#8D5B4C]"
+                      placeholder="VD: Chi nhánh Hà Nội"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2 pt-1">
+                    <button
+                      onClick={() => {
+                        if (profileForm.name.trim()) {
+                          updateUserProfile(profileForm);
+                          setIsEditingProfile(false);
+                        }
+                      }}
+                      className="flex-1 py-1.5 bg-[#8D5B4C] hover:bg-[#744537] text-white rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1 shadow-2xs"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Lưu</span>
+                    </button>
+                    <button
+                      onClick={() => setIsEditingProfile(false)}
+                      className="px-3 py-1.5 bg-[#F5EFE6] hover:bg-[#EFE5D8] text-[#6C5F57] rounded-lg text-xs font-medium transition-colors border border-[#E5DCD0]"
+                    >
+                      Hủy
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Action shortcuts */}
               <div className="py-2 space-y-1">
@@ -376,17 +467,6 @@ export default function TopHeader() {
                 >
                   <FileSpreadsheet className="w-4 h-4 text-[#2E7D32]" />
                   <span>Xuất Excel & Sao lưu</span>
-                </button>
-
-                <button
-                  onClick={() => {
-                    setViewMode('mobile');
-                    setIsProfileOpen(false);
-                  }}
-                  className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[#8D5B4C] bg-[#F5EFE6] hover:bg-[#EFE5D8] font-semibold text-left transition-colors border border-[#E5DCD0]"
-                >
-                  <Smartphone className="w-4 h-4 text-[#8D5B4C]" />
-                  <span>Xem giao diện Mobile</span>
                 </button>
               </div>
 

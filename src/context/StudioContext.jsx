@@ -101,6 +101,27 @@ export function StudioProvider({ children }) {
   const [isServicesModalOpen, setIsServicesModalOpen] = useState(false);
   const [isAccessoriesModalOpen, setIsAccessoriesModalOpen] = useState(false);
 
+  // User Profile
+  const [userProfile, setUserProfile] = useState(() => {
+    try {
+      const saved = localStorage.getItem('meyzi_studio_profile_v1');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return {
+      name: 'Tuyết Mai',
+      role: 'Chủ Studio / Makeup Artist',
+      branch: 'Chi nhánh Hà Nội'
+    };
+  });
+
+  const updateUserProfile = (newProfile) => {
+    setUserProfile(newProfile);
+    try {
+      localStorage.setItem('meyzi_studio_profile_v1', JSON.stringify(newProfile));
+    } catch (e) {}
+    showToast('Đã cập nhật thông tin chủ studio!', 'success');
+  };
+
   // Toast feedback
   const [toast, setToast] = useState({ message: '', type: 'success', isVisible: false });
 
@@ -581,7 +602,9 @@ export function StudioProvider({ children }) {
         deleteCustomer,
         recordPayment,
         settleFullPayment,
-        resetData
+        resetData,
+        userProfile,
+        updateUserProfile
       }}
     >
       {children}
