@@ -125,14 +125,14 @@ export default function MobileDetailView() {
 
           <div className="flex items-center gap-2.5">
             <Calendar className="w-4 h-4 text-[#8D5B4C] flex-shrink-0" />
-            <span>Thứ 5, 05/11/2026 • Giờ: {time}</span>
+            <span>Ngày: {date} • Giờ: {time}</span>
           </div>
 
           <div className="flex items-start gap-2.5">
             <User className="w-4 h-4 text-[#8D5B4C] flex-shrink-0 mt-0.5" />
             <div>
-              <div>{staffMakeup} (Makeup)</div>
-              <div>{staffHair} (Làm tóc)</div>
+              <div>{staffMakeup || 'Chưa phân công'} (Makeup)</div>
+              <div>{staffHair || 'Chưa phân công'} (Làm tóc)</div>
             </div>
           </div>
         </div>
@@ -141,18 +141,25 @@ export default function MobileDetailView() {
         <div className="bg-white p-4 rounded-2xl border border-[#EFE8DE] space-y-2">
           <div className="flex items-center justify-between">
             <h3 className="font-bold text-xs text-[#2C2420]">Dịch vụ</h3>
-            <button className="text-[11px] font-semibold text-[#8D5B4C] hover:underline flex items-center gap-0.5">
+            <button 
+              onClick={() => openEditModal(selectedCustomer)}
+              className="text-[11px] font-semibold text-[#8D5B4C] hover:underline flex items-center gap-0.5"
+            >
               <Plus className="w-3 h-3" />
               <span>Thêm dịch vụ</span>
             </button>
           </div>
           <ul className="space-y-1 text-xs text-[#5A4F48] pl-1">
-            {services?.map((s, i) => (
-              <li key={i} className="flex items-center gap-1.5">
-                <span className="text-[#8D5B4C] font-bold">•</span>
-                <span>{s}</span>
-              </li>
-            ))}
+            {services && services.length > 0 ? (
+              services.map((s, i) => (
+                <li key={i} className="flex items-center gap-1.5">
+                  <span className="text-[#8D5B4C] font-bold">•</span>
+                  <span>{s}</span>
+                </li>
+              ))
+            ) : (
+              <li className="text-[11px] text-[#8C7E74] italic">Chưa chọn dịch vụ</li>
+            )}
           </ul>
         </div>
 
@@ -162,15 +169,15 @@ export default function MobileDetailView() {
           <div className="space-y-1.5 text-xs">
             <div className="flex justify-between">
               <span className="text-[#8C7E74]">Tổng tiền</span>
-              <span className="font-bold text-[#2C2420]">{totalAmount?.toLocaleString('vi-VN')}đ</span>
+              <span className="font-bold text-[#2C2420]">{(totalAmount || 0).toLocaleString('vi-VN')}đ</span>
             </div>
             <div className="flex justify-between">
               <span className="text-[#8C7E74]">Đã cọc</span>
-              <span className="font-bold text-[#2E7D32]">{depositAmount?.toLocaleString('vi-VN')}đ</span>
+              <span className="font-bold text-[#2E7D32]">{(depositAmount || 0).toLocaleString('vi-VN')}đ</span>
             </div>
             <div className="flex justify-between pt-1 border-t border-[#EFE8DE]">
               <span className="text-[#8C7E74] font-semibold">Còn lại</span>
-              <span className="font-bold text-[#C62828] text-sm">{remainingAmount?.toLocaleString('vi-VN')}đ</span>
+              <span className="font-bold text-[#C62828] text-sm">{(remainingAmount || 0).toLocaleString('vi-VN')}đ</span>
             </div>
           </div>
         </div>
@@ -204,13 +211,21 @@ export default function MobileDetailView() {
         {/* Lịch sử thanh toán */}
         <div className="bg-white p-4 rounded-2xl border border-[#EFE8DE] space-y-2">
           <h3 className="font-bold text-xs text-[#2C2420]">Lịch sử thanh toán</h3>
-          <div className="flex items-center justify-between text-xs bg-[#FAF7F2] p-2.5 rounded-xl border border-[#EFE8DE]">
-            <span className="text-[#8C7E74]">05/10/2026</span>
-            <span className="font-bold text-[#2E7D32]">1.000.000đ</span>
-            <span className="text-[10px] bg-[#E8F5E9] text-[#2E7D32] px-2 py-0.5 rounded-full font-medium">
-              Đặt cọc
-            </span>
-          </div>
+          {paymentHistory && paymentHistory.length > 0 ? (
+            <div className="space-y-1.5">
+              {paymentHistory.map((item, idx) => (
+                <div key={idx} className="flex items-center justify-between text-xs bg-[#FAF7F2] p-2.5 rounded-xl border border-[#EFE8DE]">
+                  <span className="text-[#8C7E74]">{item.date}</span>
+                  <span className="font-bold text-[#2E7D32]">{(item.amount || 0).toLocaleString('vi-VN')}đ</span>
+                  <span className="text-[10px] bg-[#E8F5E9] text-[#2E7D32] px-2 py-0.5 rounded-full font-medium">
+                    {item.type || 'Thanh toán'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-[11px] text-[#8C7E74] italic">Chưa có giao dịch thanh toán nào.</p>
+          )}
         </div>
       </div>
     </div>

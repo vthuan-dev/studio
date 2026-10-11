@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { 
   ChevronLeft, 
+  ChevronRight,
   Calendar, 
   ChevronDown, 
   Plus, 
   Home, 
   Users, 
-  MoreHorizontal 
+  MoreHorizontal,
+  Clock,
+  CalendarDays
 } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 
@@ -19,91 +22,109 @@ export default function MobileDayTimeView() {
     setSelectedStaff,
     allStaffWithAll,
     selectedDate,
-    setSelectedDate
+    setSelectedDate,
+    openAddModal
   } = useStudio();
 
-  // Horizontal date strip matching Screen 2 in Image 1
-  const dateStrip = [
-    { dayName: 'T2', dayNum: 3, date: '2026-11-03' },
-    { dayName: 'T3', dayNum: 4, date: '2026-11-04' },
-    { dayName: 'T4', dayNum: 5, date: '2026-11-05', isActive: true },
-    { dayName: 'T5', dayNum: 6, date: '2026-11-06' },
-    { dayName: 'T6', dayNum: 7, date: '2026-11-07' },
-    { dayName: 'T7', dayNum: 8, date: '2026-11-08' },
-    { dayName: 'CN', dayNum: 9, date: '2026-11-09' },
-  ];
+  // Dynamic header date format: "Thứ 5, 05/11/2026"
+  const formattedHeaderDate = useMemo(() => {
+    if (!selectedDate) return '';
+    try {
+      const [y, m, d] = selectedDate.split('-').map(Number);
+      const dateObj = new Date(y, m - 1, d);
+      const days = ['Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+      const dayName = days[dateObj.getDay()];
+      return `${dayName}, ${String(d).padStart(2, '0')}/${String(m).padStart(2, '0')}/${y}`;
+    } catch {
+      return selectedDate;
+    }
+  }, [selectedDate]);
 
-  const timeSlots = [
-    { 
-      time: '06:00',
-      customer: {
-        id: 'cust-1',
-        name: 'Hồng Nhung',
-        type: 'Cô dâu',
-        phone: '0987 654 321',
-        service: 'Makeup + Làm tóc',
-        status: 'da-coc',
-        statusText: 'Đã cọc',
-        borderColor: 'border-[#F8D7DA]'
+  // Navigate to previous day
+  const handlePrevDay = () => {
+    if (!selectedDate) return;
+    const [y, m, d] = selectedDate.split('-').map(Number);
+    const prev = new Date(y, m - 1, d - 1);
+    const prevStr = `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}-${String(prev.getDate()).padStart(2, '0')}`;
+    setSelectedDate(prevStr);
+  };
+
+  // Navigate to next day
+  const handleNextDay = () => {
+    if (!selectedDate) return;
+    const [y, m, d] = selectedDate.split('-').map(Number);
+    const next = new Date(y, m - 1, d + 1);
+    const nextStr = `${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, '0')}-${String(next.getDate()).padStart(2, '0')}`;
+    setSelectedDate(nextStr);
+  };
+
+  // Dynamic 7-day horizontal strip for the week containing selectedDate
+  const dateStrip = useMemo(() => {
+    if (!selectedDate) return [];
+    try {
+      const [y, m, d] = selectedDate.split('-').map(Number);
+      const cur = new Date(y, m - 1, d);
+      const dayOfWeek = cur.getDay(); // 0 is Sun, 1 is Mon...
+      const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+      const monday = new Date(y, m - 1, d + mondayOffset);
+
+      const daysOfWeekNames = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+      const strip = [];
+      for (let i = 0; i < 7; i++) {
+        const itemDate = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);
+        const yStr = itemDate.getFullYear();
+        const mStr = String(itemDate.getMonth() + 1).padStart(2, '0');
+        const dStr = String(itemDate.getDate()).padStart(2, '0');
+        const dateKey = `${yStr}-${mStr}-${dStr}`;
+        strip.push({
+          dayName: daysOfWeekNames[i],
+          dayNum: itemDate.getDate(),
+          date: dateKey,
+          isActive: dateKey === selectedDate
+        });
       }
-    },
-    { 
-      time: '07:00',
-      customer: {
-        id: 'cust-6',
-        name: 'Ngọc Anh',
-        type: 'Cô dâu',
-        phone: '0321 555 666',
-        service: 'Makeup + Làm tóc',
-        status: 'da-coc',
-        statusText: 'Đã cọc',
-        borderColor: 'border-[#C3E6CB]'
+      return strip;
+    } catch {
+      return [];
+    }
+  }, [selectedDate]);
+
+  // Customers for this specific date
+  const dayCustomers = useMemo(() => {
+    return filteredCustomers.filter(c => c.date === selectedDate);
+  }, [filteredCustomers, selectedDate]);
+
+  // Default timeline hours
+  const DEFAULT_HOURS = useMemo(() => [
+    '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', 
+    '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', 
+    '18:00', '19:00', '20:00'
+  ], []);
+
+  // Compute dynamic time slots
+  const timeSlots = useMemo(() => {
+    const hoursSet = new Set(DEFAULT_HOURS);
+    dayCustomers.forEach(c => {
+      if (c.time) {
+        const hourPrefix = c.time.split(':')[0].padStart(2, '0') + ':00';
+        hoursSet.add(hourPrefix);
       }
-    },
-    { 
-      time: '08:00',
-      customer: {
-        id: 'cust-11',
-        name: 'Quỳnh Nga',
-        type: 'Tiệc',
-        phone: '0976 888 222',
-        service: 'Makeup',
-        status: 'chua-coc',
-        statusText: 'Chưa cọc',
-        borderColor: 'border-[#F8D7DA]'
-      }
-    },
-    { 
-      time: '09:00',
-      customer: {
-        id: 'cust-8',
-        name: 'Thanh Mai',
-        type: 'Tiệc',
-        phone: '0367 123 789',
-        service: 'Makeup + Làm tóc',
-        status: 'chua-coc',
-        statusText: 'Chưa cọc',
-        borderColor: 'border-[#F8D7DA]'
-      }
-    },
-    { time: '10:00', customer: null },
-    { time: '12:00', customer: null },
-    { 
-      time: '13:00',
-      customer: {
-        id: 'cust-12',
-        name: 'Bảo Ngọc',
-        type: 'Ăn hỏi',
-        phone: '0389 777 333',
-        service: 'Makeup + Làm tóc',
-        status: 'da-coc',
-        statusText: 'Đã cọc',
-        borderColor: 'border-[#E2D9F3]'
-      }
-    },
-    { time: '14:00', customer: null },
-    { time: '15:00', customer: null },
-  ];
+    });
+    const sortedHours = Array.from(hoursSet).sort();
+
+    return sortedHours.map(hourStr => {
+      const hNum = parseInt(hourStr.split(':')[0], 10);
+      const customersInHour = dayCustomers.filter(c => {
+        if (!c.time) return false;
+        return parseInt(c.time.split(':')[0], 10) === hNum;
+      });
+
+      return {
+        time: hourStr,
+        customers: customersInHour
+      };
+    });
+  }, [DEFAULT_HOURS, dayCustomers]);
 
   const handleSelectCustomer = (cust) => {
     if (cust) {
@@ -112,21 +133,54 @@ export default function MobileDayTimeView() {
     }
   };
 
+  const getBorderColor = (category) => {
+    switch (category) {
+      case 'co-dau': return 'border-[#F8D7DA]';
+      case 'tiec': return 'border-[#FFE2DD]';
+      case 'an-hoi': return 'border-[#E2D9F3]';
+      case 'chup-anh': return 'border-[#D0E1FD]';
+      default: return 'border-[#E5DCD0]';
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen w-full bg-[#FAF7F2] text-[#2C2420] text-xs relative select-none pb-2">
-      {/* Header matching Screen 2 */}
-      <div className="px-4 py-3 flex items-center justify-between border-b border-[#EFE8DE] bg-white sticky top-0 z-10">
-        <button 
-          onClick={() => setMobileScreen('calendar')}
-          className="p-1 hover:bg-[#FAF7F2] rounded-lg flex items-center gap-1 font-bold text-sm"
-        >
-          <ChevronLeft className="w-5 h-5 text-[#2C2420]" />
-          <span>Thứ 5, 05/11/2026</span>
-        </button>
+      {/* Header with back button & date navigation */}
+      <div className="px-3 py-3 flex items-center justify-between border-b border-[#EFE8DE] bg-white sticky top-0 z-10 shadow-xs">
+        <div className="flex items-center gap-1.5">
+          <button 
+            onClick={() => setMobileScreen('calendar')}
+            className="p-1 hover:bg-[#FAF7F2] rounded-lg text-[#2C2420]"
+            title="Về lịch tháng"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <span className="font-bold text-sm text-[#2C2420]">{formattedHeaderDate}</span>
+        </div>
 
-        <button className="p-1 hover:bg-[#FAF7F2] rounded-lg">
-          <Calendar className="w-5 h-5 text-[#8D5B4C]" />
-        </button>
+        <div className="flex items-center gap-1">
+          <button 
+            onClick={handlePrevDay} 
+            className="p-1 hover:bg-[#FAF7F2] rounded-lg text-[#8C7E74]"
+            title="Ngày trước"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <button 
+            onClick={handleNextDay} 
+            className="p-1 hover:bg-[#FAF7F2] rounded-lg text-[#8C7E74]"
+            title="Ngày sau"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+          <button 
+            onClick={() => setMobileScreen('calendar')}
+            className="p-1 hover:bg-[#FAF7F2] rounded-lg text-[#8D5B4C] ml-1"
+            title="Lịch tháng"
+          >
+            <Calendar className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
       {/* Date Strip */}
@@ -169,58 +223,97 @@ export default function MobileDayTimeView() {
         </div>
       </div>
 
-      {/* Timeline slots matching Screen 2 */}
+      {/* Timeline slots */}
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+        {dayCustomers.length === 0 && (
+          <div className="bg-white/80 border border-dashed border-[#E5DCD0] rounded-2xl p-4 text-center my-2">
+            <CalendarDays className="w-7 h-7 text-[#8C7E74] mx-auto mb-1.5 opacity-60" />
+            <p className="text-xs font-semibold text-[#6C5F57]">Chưa có lịch hẹn nào</p>
+            <p className="text-[10px] text-[#8C7E74] mt-0.5">Ngày {selectedDate} chưa có khách hẹn làm.</p>
+            <button
+              onClick={() => {
+                openAddModal({ date: selectedDate, time: '08:00' });
+                setMobileScreen('add');
+              }}
+              className="mt-2.5 inline-flex items-center gap-1 px-3 py-1.5 bg-[#8D5B4C] text-white rounded-xl text-[11px] font-semibold hover:bg-[#744537] transition-all shadow-xs"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Thêm lịch hẹn</span>
+            </button>
+          </div>
+        )}
+
         {timeSlots.map((slot, index) => (
           <div key={index} className="flex gap-3 items-start">
             <span className="w-11 text-[11px] font-bold text-[#8C7E74] pt-2 flex-shrink-0">
               {slot.time}
             </span>
 
-            <div className="flex-1">
-              {slot.customer ? (
-                <div
-                  onClick={() => handleSelectCustomer(slot.customer)}
-                  className={`bg-white p-3 rounded-2xl border ${slot.customer.borderColor} shadow-xs flex items-center justify-between cursor-pointer hover:shadow-sm transition-all`}
-                >
-                  <div>
-                    <div className="font-bold text-xs text-[#2C2420]">
-                      {slot.customer.name}{' '}
-                      <span className="font-normal text-[#8C7E74]">
-                        ({slot.customer.type})
-                      </span>
+            <div className="flex-1 space-y-2">
+              {slot.customers && slot.customers.length > 0 ? (
+                slot.customers.map((cust) => (
+                  <div
+                    key={cust.id}
+                    onClick={() => handleSelectCustomer(cust)}
+                    className={`bg-white p-3 rounded-2xl border ${getBorderColor(cust.category)} shadow-xs flex items-center justify-between cursor-pointer hover:shadow-sm transition-all`}
+                  >
+                    <div>
+                      <div className="font-bold text-xs text-[#2C2420]">
+                        {cust.name}{' '}
+                        <span className="font-normal text-[#8C7E74]">
+                          ({cust.categoryName || cust.type || 'Khách'})
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-[#8C7E74] mt-0.5">
+                        {cust.phone} {cust.time ? `• ${cust.time}` : ''}
+                      </div>
+                      <div className="text-[10px] text-[#5A4F48] font-medium mt-0.5 line-clamp-1">
+                        {Array.isArray(cust.services) ? cust.services.join(', ') : (cust.service || 'Makeup')}
+                      </div>
                     </div>
-                    <div className="text-[10px] text-[#8C7E74] mt-0.5">
-                      {slot.customer.phone}
-                    </div>
-                    <div className="text-[10px] text-[#5A4F48] font-medium mt-0.5">
-                      {slot.customer.service}
-                    </div>
-                  </div>
 
-                  <div>
-                    {slot.customer.status === 'da-coc' ? (
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#E8F5E9] text-[#2E7D32] border border-[#C8E6C9]">
-                        Đã cọc
-                      </span>
-                    ) : (
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#FFEBEE] text-[#C62828] border border-[#FFCDD2]">
-                        Chưa cọc
-                      </span>
-                    )}
+                    <div className="flex-shrink-0 ml-2">
+                      {cust.status === 'da-coc' ? (
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#E8F5E9] text-[#2E7D32] border border-[#C8E6C9]">
+                          Đã cọc
+                        </span>
+                      ) : cust.status === 'da-thanh-toan' ? (
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#E3F2FD] text-[#1565C0] border border-[#BBDEFB]">
+                          Đã thanh toán
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#FFEBEE] text-[#C62828] border border-[#FFCDD2]">
+                          Chưa cọc
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
+                ))
               ) : (
-                <div className="h-6 border-b border-dashed border-[#E5DCD0]" />
+                <div 
+                  onClick={() => {
+                    openAddModal({ date: selectedDate, time: slot.time });
+                    setMobileScreen('add');
+                  }}
+                  className="h-7 border-b border-dashed border-[#E5DCD0] flex items-center justify-end group cursor-pointer hover:border-[#8D5B4C]/60 transition-colors"
+                  title={`Thêm lịch hẹn lúc ${slot.time}`}
+                >
+                  <span className="text-[10px] text-[#B8AEA4] group-hover:text-[#8D5B4C] transition-colors pr-1">
+                    + Thêm hẹn
+                  </span>
+                </div>
               )}
             </div>
           </div>
         ))}
       </div>
 
-      {/* Floating Plus Button matching Screen 2 */}
+      {/* Floating Plus Button */}
       <button
-        onClick={() => setMobileScreen('add')}
+        onClick={() => {
+          openAddModal({ date: selectedDate, time: '08:00' });
+          setMobileScreen('add');
+        }}
         className="absolute bottom-16 right-4 w-12 h-12 rounded-full bg-[#8D5B4C] text-white flex items-center justify-center shadow-lg hover:bg-[#744537] transition-all"
         title="Thêm khách"
       >
@@ -254,7 +347,10 @@ export default function MobileDayTimeView() {
         </button>
 
         <button 
-          onClick={() => setMobileScreen('add')}
+          onClick={() => {
+            openAddModal({ date: selectedDate, time: '08:00' });
+            setMobileScreen('add');
+          }}
           className="flex flex-col items-center gap-1 text-[#8C7E74]"
         >
           <div className="w-5 h-5 rounded-full border border-gray-400 flex items-center justify-center">

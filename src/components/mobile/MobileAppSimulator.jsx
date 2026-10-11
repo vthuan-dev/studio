@@ -78,7 +78,7 @@ export default function MobileAppSimulator() {
             {/* Phone 2: Day Hourly Timeline */}
             <div className="flex flex-col items-center">
               <span className="text-xs font-bold text-[#8D5B4C] uppercase tracking-wider mb-2">
-                Màn 2: Lịch theo giờ (05/11)
+                Màn 2: Lịch theo giờ
               </span>
               <PhoneFrame>
                 <MobileDayTimeView />

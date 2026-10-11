@@ -1,32 +1,41 @@
 import React, { useState } from 'react';
-import { ChevronLeft, Calendar, Clock, Check, User } from 'lucide-react';
+import { ChevronLeft, Calendar, Clock, Check, User, MapPin } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 
 export default function MobileAddCustomer() {
-  const { setMobileScreen, addCustomer, staffList } = useStudio();
+  const { setMobileScreen, addCustomer, staffList, selectedDate, showToast } = useStudio();
 
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
-    address: 'Hà Nội',
-    date: '2026-11-05',
-    time: '06:00',
+    address: '',
+    date: selectedDate || new Date().toISOString().split('T')[0],
+    time: '08:00',
     category: 'co-dau',
-    services: ['Makeup cô dâu', 'Làm tóc'],
-    staffMakeup: 'Tuyết Mai',
-    staffHair: 'Khánh Vy',
-    totalAmount: 3200000,
-    depositAmount: 1000000,
-    note: 'Tone nhẹ nhàng, trong trẻo. Có thuê phụ kiện'
+    services: [],
+    staffMakeup: staffList[0]?.name || '',
+    staffHair: staffList[1]?.name || staffList[0]?.name || '',
+    totalAmount: 0,
+    depositAmount: 0,
+    note: ''
   });
 
-  const remaining = Math.max(0, formData.totalAmount - formData.depositAmount);
+  const remaining = Math.max(0, (Number(formData.totalAmount) || 0) - (Number(formData.depositAmount) || 0));
+
+  const categories = [
+    { id: 'co-dau', label: 'Cô dâu' },
+    { id: 'an-hoi', label: 'Ăn hỏi' },
+    { id: 'tiec', label: 'Tiệc' },
+    { id: 'chup-anh', label: 'Chụp ảnh' },
+  ];
 
   const servicesList = [
     { id: 'mu-bride', label: 'Makeup cô dâu', cat: 'co-dau' },
     { id: 'hair', label: 'Làm tóc', cat: null },
     { id: 'photo', label: 'Chụp ảnh', cat: 'chup-anh' },
     { id: 'acc', label: 'Thuê phụ kiện', cat: null },
+    { id: 'mu-party', label: 'Makeup tiệc', cat: 'tiec' },
+    { id: 'mu-anhoi', label: 'Makeup ăn hỏi', cat: 'an-hoi' },
   ];
 
   const handleToggle = (svc) => {
@@ -43,38 +52,50 @@ export default function MobileAddCustomer() {
   };
 
   const handleSave = () => {
-    if (!formData.name) return;
+    if (!formData.name.trim()) {
+      showToast('Vui lòng nhập họ tên khách hàng!', 'error');
+      return;
+    }
+
+    const catObj = categories.find(c => c.id === formData.category);
+    const categoryName = catObj ? catObj.label : 'Cô dâu';
+
     addCustomer({
       ...formData,
-      categoryName: formData.category === 'co-dau' ? 'Cô dâu' : 'Tiệc'
+      categoryName,
+      totalAmount: Number(formData.totalAmount) || 0,
+      depositAmount: Number(formData.depositAmount) || 0,
+      remainingAmount: remaining
     });
-    setMobileScreen('detail');
+
+    showToast(`Đã thêm lịch hẹn khách ${formData.name}!`, 'success');
+    setMobileScreen('hourly');
   };
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-[#FAF7F2] text-[#2C2420] text-xs select-none pb-6">
-      {/* Header matching Screen 3 */}
-      <div className="px-4 py-3 flex items-center justify-between border-b border-[#EFE8DE] bg-white sticky top-0 z-10">
+      {/* Header */}
+      <div className="px-4 py-3 flex items-center justify-between border-b border-[#EFE8DE] bg-white sticky top-0 z-10 shadow-xs">
         <button 
           onClick={() => setMobileScreen('calendar')}
           className="p-1 hover:bg-[#FAF7F2] rounded-lg flex items-center gap-1 font-bold text-sm text-[#2C2420]"
         >
           <ChevronLeft className="w-5 h-5" />
-          <span>Thêm khách</span>
+          <span>Thêm khách mới</span>
         </button>
 
         <button 
           onClick={handleSave}
-          className="font-bold text-sm text-[#8D5B4C] hover:underline"
+          className="font-bold text-sm text-white bg-[#8D5B4C] hover:bg-[#744537] px-3 py-1.5 rounded-xl transition-all shadow-xs"
         >
           Lưu
         </button>
       </div>
 
-      {/* Form Content matching Screen 3 */}
+      {/* Form Content */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {/* Thông tin khách hàng */}
-        <div className="bg-white p-4 rounded-2xl border border-[#EFE8DE] space-y-3">
+        <div className="bg-white p-4 rounded-2xl border border-[#EFE8DE] space-y-3 shadow-xs">
           <h3 className="font-bold text-xs text-[#2C2420]">
             Thông tin khách hàng
           </h3>
@@ -86,8 +107,8 @@ export default function MobileAddCustomer() {
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="VD: Hồng Nhung"
-                className="w-full bg-[#FAF7F2] border border-[#EFE8DE] rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none"
+                placeholder="VD: Nguyễn Thị Lan"
+                className="w-full bg-[#FAF7F2] border border-[#EFE8DE] rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#8D5B4C]"
               />
             </div>
 
@@ -98,41 +119,82 @@ export default function MobileAddCustomer() {
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 placeholder="VD: 0987 654 321"
-                className="w-full bg-[#FAF7F2] border border-[#EFE8DE] rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none"
+                className="w-full bg-[#FAF7F2] border border-[#EFE8DE] rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#8D5B4C]"
               />
+            </div>
+
+            <div>
+              <label className="text-[10px] text-[#8C7E74] font-medium block mb-1">Địa chỉ</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  placeholder="VD: Thường Tín, Hà Nội"
+                  className="w-full bg-[#FAF7F2] border border-[#EFE8DE] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#8D5B4C]"
+                />
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Ngày làm */}
-        <div className="bg-white p-4 rounded-2xl border border-[#EFE8DE] space-y-2">
-          <h3 className="font-bold text-xs text-[#2C2420]">Ngày làm</h3>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="flex items-center gap-2 bg-[#FAF7F2] p-2 rounded-xl border border-[#EFE8DE]">
-              <Calendar className="w-4 h-4 text-[#8D5B4C]" />
-              <input
-                type="text"
-                value="05/11/2026"
-                readOnly
-                className="bg-transparent text-xs font-semibold focus:outline-none w-full"
-              />
+        {/* Phân loại & Ngày giờ làm */}
+        <div className="bg-white p-4 rounded-2xl border border-[#EFE8DE] space-y-3 shadow-xs">
+          <h3 className="font-bold text-xs text-[#2C2420]">Phân loại & Thời gian</h3>
+
+          {/* Phân loại khách */}
+          <div>
+            <label className="text-[10px] text-[#8C7E74] font-medium block mb-1.5">Loại khách</label>
+            <div className="grid grid-cols-4 gap-1.5">
+              {categories.map((c) => (
+                <button
+                  type="button"
+                  key={c.id}
+                  onClick={() => setFormData({ ...formData, category: c.id })}
+                  className={`py-1.5 rounded-xl text-center text-[11px] font-semibold transition-all ${
+                    formData.category === c.id
+                      ? 'bg-[#8D5B4C] text-white shadow-xs'
+                      : 'bg-[#FAF7F2] border border-[#EFE8DE] text-[#6C5F57]'
+                  }`}
+                >
+                  {c.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 pt-1">
+            <div>
+              <label className="text-[10px] text-[#8C7E74] font-medium block mb-1">Ngày làm</label>
+              <div className="flex items-center gap-2 bg-[#FAF7F2] px-2.5 py-1.5 rounded-xl border border-[#EFE8DE]">
+                <Calendar className="w-4 h-4 text-[#8D5B4C] flex-shrink-0" />
+                <input
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  className="bg-transparent text-xs font-semibold focus:outline-none w-full"
+                />
+              </div>
             </div>
 
-            <div className="flex items-center gap-2 bg-[#FAF7F2] p-2 rounded-xl border border-[#EFE8DE]">
-              <Clock className="w-4 h-4 text-[#8D5B4C]" />
-              <input
-                type="text"
-                value="06:00"
-                readOnly
-                className="bg-transparent text-xs font-semibold focus:outline-none w-full"
-              />
+            <div>
+              <label className="text-[10px] text-[#8C7E74] font-medium block mb-1">Giờ làm</label>
+              <div className="flex items-center gap-2 bg-[#FAF7F2] px-2.5 py-1.5 rounded-xl border border-[#EFE8DE]">
+                <Clock className="w-4 h-4 text-[#8D5B4C] flex-shrink-0" />
+                <input
+                  type="time"
+                  value={formData.time}
+                  onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                  className="bg-transparent text-xs font-semibold focus:outline-none w-full"
+                />
+              </div>
             </div>
           </div>
         </div>
 
         {/* Dịch vụ */}
-        <div className="bg-white p-4 rounded-2xl border border-[#EFE8DE] space-y-2">
-          <h3 className="font-bold text-xs text-[#2C2420]">Dịch vụ *</h3>
+        <div className="bg-white p-4 rounded-2xl border border-[#EFE8DE] space-y-2 shadow-xs">
+          <h3 className="font-bold text-xs text-[#2C2420]">Dịch vụ yêu cầu</h3>
           <div className="grid grid-cols-2 gap-2">
             {servicesList.map((svc) => {
               const isChecked = formData.services.includes(svc.label);
@@ -160,7 +222,7 @@ export default function MobileAddCustomer() {
         </div>
 
         {/* Phân công nhân viên */}
-        <div className="bg-white p-4 rounded-2xl border border-[#EFE8DE] space-y-2.5">
+        <div className="bg-white p-4 rounded-2xl border border-[#EFE8DE] space-y-2.5 shadow-xs">
           <h3 className="font-bold text-xs text-[#2C2420]">Phân công nhân viên</h3>
           <div className="grid grid-cols-2 gap-2">
             <div>
@@ -198,21 +260,33 @@ export default function MobileAddCustomer() {
         </div>
 
         {/* Giá dịch vụ */}
-        <div className="bg-white p-4 rounded-2xl border border-[#EFE8DE] space-y-2.5">
-          <h3 className="font-bold text-xs text-[#2C2420]">Giá dịch vụ</h3>
+        <div className="bg-white p-4 rounded-2xl border border-[#EFE8DE] space-y-2.5 shadow-xs">
+          <h3 className="font-bold text-xs text-[#2C2420]">Giá dịch vụ & Đặt cọc</h3>
           
           <div className="flex items-center justify-between">
-            <span className="text-[11px] text-[#8C7E74]">Tổng tiền *</span>
+            <span className="text-[11px] text-[#8C7E74]">Tổng tiền (VNĐ) *</span>
             <div className="flex items-center gap-1">
-              <span className="font-bold text-xs">3.200.000</span>
+              <input
+                type="number"
+                value={formData.totalAmount || ''}
+                onChange={(e) => setFormData({ ...formData, totalAmount: Number(e.target.value) || 0 })}
+                placeholder="0"
+                className="w-28 text-right font-bold text-xs bg-[#FAF7F2] border border-[#EFE8DE] rounded-lg px-2 py-1 focus:outline-none focus:border-[#8D5B4C]"
+              />
               <span className="text-[10px] text-[#8C7E74]">đ</span>
             </div>
           </div>
 
           <div className="flex items-center justify-between">
-            <span className="text-[11px] text-[#8C7E74]">Đã cọc</span>
+            <span className="text-[11px] text-[#8C7E74]">Đã cọc (VNĐ)</span>
             <div className="flex items-center gap-1">
-              <span className="font-bold text-xs text-[#2E7D32]">1.000.000</span>
+              <input
+                type="number"
+                value={formData.depositAmount || ''}
+                onChange={(e) => setFormData({ ...formData, depositAmount: Number(e.target.value) || 0 })}
+                placeholder="0"
+                className="w-28 text-right font-bold text-xs text-[#2E7D32] bg-[#FAF7F2] border border-[#EFE8DE] rounded-lg px-2 py-1 focus:outline-none focus:border-[#8D5B4C]"
+              />
               <span className="text-[10px] text-[#8C7E74]">đ</span>
             </div>
           </div>
@@ -220,18 +294,22 @@ export default function MobileAddCustomer() {
           <div className="flex items-center justify-between pt-2 border-t border-[#EFE8DE]">
             <span className="text-[11px] font-bold text-[#2C2420]">Còn lại</span>
             <div className="flex items-center gap-1">
-              <span className="font-bold text-xs text-[#C62828]">2.200.000</span>
+              <span className="font-bold text-xs text-[#C62828]">{remaining.toLocaleString('vi-VN')}</span>
               <span className="text-[10px] text-[#8C7E74]">đ</span>
             </div>
           </div>
         </div>
 
         {/* Ghi chú */}
-        <div className="bg-white p-4 rounded-2xl border border-[#EFE8DE] space-y-2">
+        <div className="bg-white p-4 rounded-2xl border border-[#EFE8DE] space-y-2 shadow-xs">
           <h3 className="font-bold text-xs text-[#2C2420]">Ghi chú</h3>
-          <p className="text-[11px] text-[#5A4F48] bg-[#FAF7F2] p-2.5 rounded-xl border border-[#EFE8DE] leading-relaxed">
-            {formData.note}
-          </p>
+          <textarea
+            rows={3}
+            value={formData.note}
+            onChange={(e) => setFormData({ ...formData, note: e.target.value })}
+            placeholder="Ghi chú yêu cầu của khách (VD: Tone tự nhiên, có thuê phụ kiện vương miện...)"
+            className="w-full text-xs text-[#5A4F48] bg-[#FAF7F2] p-2.5 rounded-xl border border-[#EFE8DE] leading-relaxed focus:outline-none focus:border-[#8D5B4C]"
+          />
         </div>
       </div>
     </div>

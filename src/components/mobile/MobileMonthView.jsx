@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   Menu, 
   Bell, 
@@ -19,6 +19,7 @@ export default function MobileMonthView() {
   const { 
     filteredCustomers, 
     setSelectedCustomerId, 
+    selectedDate,
     setSelectedDate, 
     setMobileScreen,
     currentMonth,
@@ -26,34 +27,33 @@ export default function MobileMonthView() {
     calendarView,
     setCalendarView,
     setIsStatsModalOpen,
-    setIsNotificationOpen
+    setIsNotificationOpen,
+    navigatePrev,
+    navigateNext,
+    openAddModal
   } = useStudio();
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const weekDays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
 
-  // Cells for mobile calendar
-  const cells = [
-    { day: 27, isCurrent: false, date: '2026-10-27' },
-    { day: 2,  isCurrent: true,  date: '2026-11-02' },
-    { day: 4,  isCurrent: true,  date: '2026-11-04' },
-    { day: 1,  isCurrent: true,  date: '2026-11-01' },
-    { day: 3,  isCurrent: true,  date: '2026-11-03' },
-    { day: 5,  isCurrent: true,  date: '2026-11-05', isActive: true },
-    { day: 7,  isCurrent: true,  date: '2026-11-07' },
-    { day: 9,  isCurrent: true,  date: '2026-11-09' },
-    { day: 11, isCurrent: true,  date: '2026-11-11' },
-    { day: 13, isCurrent: true,  date: '2026-11-13' },
-    { day: 15, isCurrent: true,  date: '2026-11-15' },
-    { day: 17, isCurrent: true,  date: '2026-11-17' },
-    { day: 18, isCurrent: true,  date: '2026-11-18' },
-    { day: 20, isCurrent: true,  date: '2026-11-20' },
-    { day: 22, isCurrent: true,  date: '2026-11-22' },
-    { day: 23, isCurrent: true,  date: '2026-11-23' },
-    { day: 24, isCurrent: true,  date: '2026-11-24' },
-    { day: 27, isCurrent: true,  date: '2026-11-27' },
-  ];
+  // Dynamically compute calendar cells for currentMonth & currentYear
+  const cells = useMemo(() => {
+    const year = currentYear;
+    const month = currentMonth;
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const result = [];
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      result.push({
+        day: d,
+        isCurrent: true,
+        date: dateStr,
+        isActive: dateStr === selectedDate
+      });
+    }
+    return result;
+  }, [currentYear, currentMonth, selectedDate]);
 
   const getStyleByCategory = (cat) => {
     switch (cat) {
@@ -85,14 +85,10 @@ export default function MobileMonthView() {
           title="Thông báo & Nhắc lịch"
         >
           <Bell className="w-5 h-5 text-[#2C2420]" />
-          <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-[#C62828] text-white rounded-full text-[9px] font-bold flex items-center justify-center">
-            3
-          </span>
         </button>
       </div>
 
       <MobileDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
-
 
       {/* Title & Month Switcher */}
       <div className="px-4 pt-4 pb-2">
@@ -102,14 +98,30 @@ export default function MobileMonthView() {
 
         <div className="flex items-center justify-between mt-2.5">
           <div className="flex items-center gap-1.5 bg-[#F5EFE6] px-2.5 py-1.5 rounded-xl border border-[#E5DCD0]">
-            <ChevronLeft className="w-3.5 h-3.5 text-[#6C5F57]" />
-            <ChevronRight className="w-3.5 h-3.5 text-[#6C5F57]" />
-            <span className="text-xs font-semibold pl-1 text-[#2C2420]">
+            <button 
+              onClick={navigatePrev}
+              className="p-0.5 hover:bg-[#FAF7F2] rounded text-[#6C5F57]"
+              title="Tháng trước"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+            </button>
+            <span className="text-xs font-semibold px-1 text-[#2C2420]">
               Tháng {currentMonth}, {currentYear}
             </span>
+            <button 
+              onClick={navigateNext}
+              className="p-0.5 hover:bg-[#FAF7F2] rounded text-[#6C5F57]"
+              title="Tháng sau"
+            >
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
           </div>
 
-          <button className="p-2 bg-[#F5EFE6] rounded-xl border border-[#E5DCD0] text-[#6C5F57]">
+          <button 
+            onClick={() => setIsStatsModalOpen(true)}
+            className="p-2 bg-[#F5EFE6] rounded-xl border border-[#E5DCD0] text-[#6C5F57] hover:text-[#8D5B4C]"
+            title="Thống kê"
+          >
             <Filter className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -125,7 +137,10 @@ export default function MobileMonthView() {
             Tháng
           </button>
           <button 
-            onClick={() => setCalendarView('week')}
+            onClick={() => {
+              setCalendarView('week');
+              setMobileScreen('hourly');
+            }}
             className={`py-1 rounded-lg text-center font-semibold text-xs ${
               calendarView === 'week' ? 'bg-[#8D5B4C] text-white shadow-xs' : 'text-[#6C5F57]'
             }`}
@@ -202,8 +217,11 @@ export default function MobileMonthView() {
       {/* Bottom Floating Add Button */}
       <div className="p-3 bg-white border-t border-[#EFE8DE]">
         <button
-          onClick={() => setMobileScreen('add')}
-          className="w-full py-2.5 rounded-xl bg-[#8D5B4C] text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-sm"
+          onClick={() => {
+            openAddModal({ date: selectedDate });
+            setMobileScreen('add');
+          }}
+          className="w-full py-2.5 rounded-xl bg-[#8D5B4C] text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-sm hover:bg-[#744537] transition-all"
         >
           <Plus className="w-4 h-4" />
           <span>Thêm khách</span>
@@ -214,15 +232,15 @@ export default function MobileMonthView() {
       <div className="sticky bottom-0 left-0 right-0 grid grid-cols-5 text-center py-2 px-1 bg-white border-t border-[#EFE8DE] text-[10px] z-20">
         <button 
           onClick={() => setMobileScreen('calendar')}
-          className="flex flex-col items-center gap-1 text-[#8C7E74]"
+          className="flex flex-col items-center gap-1 text-[#8D5B4C] font-bold"
         >
           <Home className="w-4 h-4" />
           <span>Tổng quan</span>
         </button>
 
         <button 
-          onClick={() => setMobileScreen('calendar')}
-          className="flex flex-col items-center gap-1 text-[#8D5B4C] font-bold"
+          onClick={() => setMobileScreen('hourly')}
+          className="flex flex-col items-center gap-1 text-[#8C7E74]"
         >
           <Calendar className="w-4 h-4" />
           <span>Lịch khách</span>
@@ -237,7 +255,10 @@ export default function MobileMonthView() {
         </button>
 
         <button 
-          onClick={() => setMobileScreen('add')}
+          onClick={() => {
+            openAddModal({ date: selectedDate });
+            setMobileScreen('add');
+          }}
           className="flex flex-col items-center gap-1 text-[#8C7E74]"
         >
           <div className="w-5 h-5 rounded-full border border-gray-400 flex items-center justify-center">
