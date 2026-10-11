@@ -3,7 +3,7 @@ import { ChevronLeft, Calendar, Clock, Check, User } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 
 export default function MobileAddCustomer() {
-  const { setMobileScreen, addCustomer } = useStudio();
+  const { setMobileScreen, addCustomer, staffList } = useStudio();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -160,27 +160,39 @@ export default function MobileAddCustomer() {
         </div>
 
         {/* Phân công nhân viên */}
-        <div className="bg-white p-4 rounded-2xl border border-[#EFE8DE] space-y-2">
+        <div className="bg-white p-4 rounded-2xl border border-[#EFE8DE] space-y-2.5">
           <h3 className="font-bold text-xs text-[#2C2420]">Phân công nhân viên</h3>
           <div className="grid grid-cols-2 gap-2">
-            <div className="flex items-center gap-2 bg-[#FAF7F2] p-2 rounded-xl border border-[#EFE8DE]">
-              <div className="w-8 h-8 rounded-full bg-[#8D5B4C]/10 flex items-center justify-center text-[#8D5B4C] flex-shrink-0">
-                <User className="w-4 h-4" />
-              </div>
-              <div>
-                <div className="text-[11px] font-bold">Tuyết Mai</div>
-                <div className="text-[9px] text-[#8C7E74]">Makeup</div>
-              </div>
+            <div>
+              <label className="block text-[10px] text-[#8C7E74] font-semibold mb-1">Thợ Makeup</label>
+              <select
+                value={formData.staffMakeup}
+                onChange={(e) => setFormData({ ...formData, staffMakeup: e.target.value })}
+                className="w-full bg-[#FAF7F2] border border-[#EFE8DE] rounded-xl px-2.5 py-2 text-xs font-medium focus:outline-none"
+              >
+                <option value="">-- Chọn thợ --</option>
+                {staffList.map((s) => (
+                  <option key={s.id} value={s.name}>
+                    {s.name} ({s.role})
+                  </option>
+                ))}
+              </select>
             </div>
 
-            <div className="flex items-center gap-2 bg-[#FAF7F2] p-2 rounded-xl border border-[#EFE8DE]">
-              <div className="w-8 h-8 rounded-full bg-[#8D5B4C]/10 flex items-center justify-center text-[#8D5B4C] flex-shrink-0">
-                <User className="w-4 h-4" />
-              </div>
-              <div>
-                <div className="text-[11px] font-bold">Khánh Vy</div>
-                <div className="text-[9px] text-[#8C7E74]">Làm tóc</div>
-              </div>
+            <div>
+              <label className="block text-[10px] text-[#8C7E74] font-semibold mb-1">Thợ Làm tóc</label>
+              <select
+                value={formData.staffHair}
+                onChange={(e) => setFormData({ ...formData, staffHair: e.target.value })}
+                className="w-full bg-[#FAF7F2] border border-[#EFE8DE] rounded-xl px-2.5 py-2 text-xs font-medium focus:outline-none"
+              >
+                <option value="">-- Chọn thợ --</option>
+                {staffList.map((s) => (
+                  <option key={s.id} value={s.name}>
+                    {s.name} ({s.role})
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </div>

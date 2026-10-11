@@ -1,0 +1,26 @@
+[
+  {
+    "id": "tuyet-mai",
+    "name": "Tuyết Mai",
+    "role": "Makeup Artist",
+    "specialty": "makeup",
+    "phone": "0987 111 222",
+    "active": true
+  },
+  {
+    "id": "khanh-vy",
+    "name": "Khánh Vy",
+    "role": "Làm tóc (Hair Stylist)",
+    "specialty": "hair",
+    "phone": "0987 333 444",
+    "active": true
+  },
+  {
+    "id": "lan-huong",
+    "name": "Lan Hương",
+    "role": "Makeup & Làm tóc",
+    "specialty": "both",
+    "phone": "0987 555 666",
+    "active": true
+  }
+]

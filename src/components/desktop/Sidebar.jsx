@@ -6,7 +6,8 @@ import {
   AlertCircle, 
   TrendingUp, 
   Settings, 
-  RotateCcw
+  RotateCcw,
+  UserCheck
 } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 import BrandLogo from '../common/BrandLogo';
@@ -20,6 +21,8 @@ export default function Sidebar() {
     resetData, 
     setIsStatsModalOpen,
     setIsExportModalOpen,
+    setIsStaffModalOpen,
+    staffList,
     showToast
   } = useStudio();
 
@@ -57,6 +60,14 @@ export default function Sidebar() {
       badge: stats.countUnpaid,
       badgeColor: 'bg-amber-100 text-amber-800 border border-amber-200',
       type: 'scroll'
+    },
+    { 
+      id: 'nhan-su', 
+      label: 'Đội ngũ nhân sự', 
+      icon: UserCheck,
+      badge: staffList?.length || 0,
+      badgeColor: 'bg-emerald-100 text-emerald-800 border border-emerald-200',
+      type: 'modal'
     },
     { 
       id: 'doanh-thu', 
@@ -97,6 +108,8 @@ export default function Sidebar() {
           showToast('Đã cuộn đến Danh sách khách hàng');
         }
       }
+    } else if (item.id === 'nhan-su') {
+      setIsStaffModalOpen(true);
     } else if (item.id === 'doanh-thu') {
       setIsStatsModalOpen(true);
     } else if (item.id === 'cai-dat') {

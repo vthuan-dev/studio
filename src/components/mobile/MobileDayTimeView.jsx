@@ -9,7 +9,6 @@ import {
   MoreHorizontal 
 } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
-import { STAFFS } from '../../data/mockData';
 
 export default function MobileDayTimeView() {
   const { 
@@ -18,6 +17,7 @@ export default function MobileDayTimeView() {
     setMobileScreen,
     selectedStaff,
     setSelectedStaff,
+    allStaffWithAll,
     selectedDate,
     setSelectedDate
   } = useStudio();
@@ -159,7 +159,7 @@ export default function MobileDayTimeView() {
             onChange={(e) => setSelectedStaff(e.target.value)}
             className="w-full appearance-none bg-[#F5EFE6] border border-[#E5DCD0] text-[#2C2420] text-xs font-semibold py-2 pl-3 pr-8 rounded-xl focus:outline-none"
           >
-            {STAFFS.map((s) => (
+            {allStaffWithAll.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}
               </option>

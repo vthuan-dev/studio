@@ -1,12 +1,55 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { useContext, useState, useEffect, useMemo } from 'react';
 import initialCustomersJson from '../data/customers.json';
+import initialStaffJson from '../data/staff.json';
 import { STAFFS, SERVICE_CATEGORIES } from '../data/mockData';
-
-const StudioContext = createContext();
+import { StudioContext, defaultStudioContext } from './studioContextInstance';
 
 const STORAGE_KEY = 'meyzi_studio_customers_v3';
+const STAFF_STORAGE_KEY = 'meyzi_studio_staff_v1';
 
 export function StudioProvider({ children }) {
+  // Staff list with JSON and localStorage persistence (CRUD enabled)
+  const [staffList, setStaffList] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STAFF_STORAGE_KEY);
+      if (saved !== null) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      console.error('Failed to load staff from localStorage', e);
+    }
+    return Array.isArray(initialStaffJson) && initialStaffJson.length > 0
+      ? initialStaffJson
+      : STAFFS.filter(s => s.id !== 'all');
+  });
+
+  // On mount: fetch latest staff from API
+  useEffect(() => {
+    fetch('/api/staff')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setStaffList(data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  // Save staff to localStorage & persist directly to src/data/staff.json
+  useEffect(() => {
+    try {
+      localStorage.setItem(STAFF_STORAGE_KEY, JSON.stringify(staffList));
+      fetch('/api/staff', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(staffList)
+      }).catch(() => {});
+    } catch (e) {
+      console.error('Failed to save staff data', e);
+    }
+  }, [staffList]);
+
   // Customers list with JSON and localStorage persistence
   const [customers, setCustomers] = useState(() => {
     try {
@@ -268,7 +311,7 @@ export function StudioProvider({ children }) {
 
       // Staff filter
       if (selectedStaff !== 'all') {
-        const staffObj = STAFFS.find(s => s.id === selectedStaff);
+        const staffObj = staffList.find(s => s.id === selectedStaff);
         if (staffObj && !customer.staffMakeup?.includes(staffObj.name) && !customer.staffHair?.includes(staffObj.name)) {
           return false;
         }
@@ -293,7 +336,7 @@ export function StudioProvider({ children }) {
 
       return true;
     });
-  }, [customers, activeSidebarTab, selectedStaff, selectedCategory, searchTerm]);
+  }, [customers, activeSidebarTab, selectedStaff, selectedCategory, searchTerm, staffList]);
 
   // Actions
   const addCustomer = (customerData) => {
@@ -524,6 +567,54 @@ export function StudioProvider({ children }) {
     }
   };
 
+  // Staff CRUD Operations
+  const allStaffWithAll = useMemo(() => [
+    { id: 'all', name: 'Tất cả nhân viên', role: 'all' },
+    ...staffList
+  ], [staffList]);
+
+  const addStaff = (staffData) => {
+    const newStaff = {
+      id: 'staff-' + Date.now(),
+      name: staffData.name.trim(),
+      role: staffData.role?.trim() || 'Makeup Artist',
+      specialty: staffData.specialty || 'makeup',
+      phone: staffData.phone?.trim() || '',
+      note: staffData.note?.trim() || '',
+      active: true
+    };
+    setStaffList(prev => [...prev, newStaff]);
+    showToast(`Đã thêm nhân viên "${newStaff.name}" thành công!`);
+    return newStaff;
+  };
+
+  const updateStaff = (id, staffData) => {
+    setStaffList(prev => prev.map(s => {
+      if (s.id === id) {
+        return {
+          ...s,
+          ...staffData,
+          name: staffData.name ? staffData.name.trim() : s.name,
+          role: staffData.role ? staffData.role.trim() : s.role,
+        };
+      }
+      return s;
+    }));
+    showToast(`Đã cập nhật thông tin nhân viên "${staffData.name || ''}"!`);
+  };
+
+  const deleteStaff = (id) => {
+    const target = staffList.find(s => s.id === id);
+    if (!target) return;
+    if (confirm(`Bạn có chắc chắn muốn xóa nhân viên "${target.name}"?`)) {
+      setStaffList(prev => prev.filter(s => s.id !== id));
+      if (selectedStaff === id) {
+        setSelectedStaff('all');
+      }
+      showToast(`Đã xóa nhân viên "${target.name}" thành công!`);
+    }
+  };
+
   const openAddModal = (prefill = null) => {
     setEditingCustomer(prefill ? { ...prefill, _isNew: true } : null);
     setIsCustomerModalOpen(true);
@@ -603,7 +694,12 @@ export function StudioProvider({ children }) {
         settleFullPayment,
         resetData,
         userProfile,
-        updateUserProfile
+        updateUserProfile,
+        staffList,
+        allStaffWithAll,
+        addStaff,
+        updateStaff,
+        deleteStaff
       }}
     >
       {children}
@@ -614,8 +710,5 @@ export function StudioProvider({ children }) {
 
 export function useStudio() {
   const context = useContext(StudioContext);
-  if (!context) {
-    throw new Error('useStudio must be used within a StudioProvider');
-  }
-  return context;
+  return context || defaultStudioContext;
 }

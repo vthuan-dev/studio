@@ -10,7 +10,9 @@ export default function CustomerModal() {
     setIsCustomerModalOpen,
     editingCustomer,
     addCustomer,
-    updateCustomer
+    updateCustomer,
+    staffList,
+    setIsStaffModalOpen
   } = useStudio();
 
   const [formData, setFormData] = useState({
@@ -265,9 +267,20 @@ export default function CustomerModal() {
 
           {/* Phân công nhân viên */}
           <div className="space-y-3 pt-3 border-t border-[#EFE8DE]">
-            <h4 className="font-bold text-[#8D5B4C] uppercase tracking-wider text-[11px]">
-              Phân công nhân viên
-            </h4>
+            <div className="flex items-center justify-between">
+              <h4 className="font-bold text-[#8D5B4C] uppercase tracking-wider text-[11px]">
+                Phân công nhân viên
+              </h4>
+              <button
+                type="button"
+                onClick={() => setIsStaffModalOpen(true)}
+                className="text-[11px] text-[#8D5B4C] hover:underline font-semibold flex items-center gap-1"
+                title="Quản lý danh sách nhân viên (Thêm, Sửa, Xóa)"
+              >
+                <span>+ Quản lý thợ</span>
+              </button>
+            </div>
+            
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-[11px] font-semibold text-[#6C5F57] mb-1">
@@ -276,10 +289,14 @@ export default function CustomerModal() {
                 <select
                   value={formData.staffMakeup}
                   onChange={(e) => setFormData({ ...formData, staffMakeup: e.target.value })}
-                  className="w-full bg-[#FAF7F2] border border-[#EFE8DE] rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#8D5B4C]/20 font-medium"
+                  className="w-full bg-[#FAF7F2] border border-[#EFE8DE] rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#8D5B4C]/20 font-medium cursor-pointer"
                 >
-                  <option value="Tuyết Mai">Tuyết Mai (Makeup)</option>
-                  <option value="Lan Hương">Lan Hương (Makeup)</option>
+                  <option value="">-- Chưa chọn thợ --</option>
+                  {staffList.map((s) => (
+                    <option key={s.id} value={s.name}>
+                      {s.name} ({s.role})
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -290,10 +307,14 @@ export default function CustomerModal() {
                 <select
                   value={formData.staffHair}
                   onChange={(e) => setFormData({ ...formData, staffHair: e.target.value })}
-                  className="w-full bg-[#FAF7F2] border border-[#EFE8DE] rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#8D5B4C]/20 font-medium"
+                  className="w-full bg-[#FAF7F2] border border-[#EFE8DE] rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#8D5B4C]/20 font-medium cursor-pointer"
                 >
-                  <option value="Khánh Vy">Khánh Vy (Làm tóc)</option>
-                  <option value="Tuyết Mai">Tuyết Mai (Kiêm tóc)</option>
+                  <option value="">-- Chưa chọn thợ --</option>
+                  {staffList.map((s) => (
+                    <option key={s.id} value={s.name}>
+                      {s.name} ({s.role})
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>

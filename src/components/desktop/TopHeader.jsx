@@ -14,10 +14,11 @@ import {
   RotateCcw,
   Check,
   Sparkles,
-  Edit3
+  Edit3,
+  UserCheck,
+  Users
 } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
-import { STAFFS } from '../../data/mockData';
 
 export default function TopHeader() {
   const { 
@@ -30,6 +31,9 @@ export default function TopHeader() {
     setCalendarView,
     selectedStaff,
     setSelectedStaff,
+    allStaffWithAll,
+    staffList,
+    setIsStaffModalOpen,
     searchTerm,
     setSearchTerm,
     setIsStatsModalOpen,
@@ -241,21 +245,31 @@ export default function TopHeader() {
           </button>
         </div>
 
-        {/* Staff dropdown filter */}
-        <div className="relative">
-          <select
-            value={selectedStaff}
-            onChange={(e) => setSelectedStaff(e.target.value)}
-            className="appearance-none bg-[#F5EFE6] border border-[#E5DCD0] text-[#2C2420] text-xs font-medium py-2 pl-3.5 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#8D5B4C]/20 cursor-pointer"
-            title="Lọc lịch hẹn theo nhân viên"
+        {/* Staff dropdown filter & Manage button */}
+        <div className="flex items-center gap-1.5">
+          <div className="relative">
+            <select
+              value={selectedStaff}
+              onChange={(e) => setSelectedStaff(e.target.value)}
+              className="appearance-none bg-[#F5EFE6] border border-[#E5DCD0] text-[#2C2420] text-xs font-medium py-2 pl-3.5 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#8D5B4C]/20 cursor-pointer"
+              title="Lọc lịch hẹn theo nhân viên"
+            >
+              {allStaffWithAll.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="w-3.5 h-3.5 text-[#8D5B4C] absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+
+          <button
+            onClick={() => setIsStaffModalOpen(true)}
+            className="p-2 rounded-xl border border-[#E5DCD0] bg-[#F5EFE6] hover:bg-[#EFE5D8] text-[#8D5B4C] transition-colors"
+            title="Quản lý đội ngũ nhân viên (Thêm, Sửa, Xóa)"
           >
-            {STAFFS.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-          <ChevronDown className="w-3.5 h-3.5 text-[#8D5B4C] absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Users className="w-3.5 h-3.5" />
+          </button>
         </div>
 
         {/* Search */}
@@ -434,6 +448,17 @@ export default function TopHeader() {
                 >
                   <Plus className="w-4 h-4 text-[#8D5B4C]" />
                   <span>+ Thêm khách mới</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setIsStaffModalOpen(true);
+                    setIsProfileOpen(false);
+                  }}
+                  className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[#2C2420] hover:bg-[#FAF7F2] font-medium text-left"
+                >
+                  <UserCheck className="w-4 h-4 text-[#8D5B4C]" />
+                  <span>Quản lý nhân viên ({staffList.length} thợ)</span>
                 </button>
 
                 <button
