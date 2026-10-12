@@ -389,9 +389,14 @@ export default function CalendarGrid() {
                             <div className="font-semibold truncate leading-tight flex items-center gap-1">
                               <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${getDotColor(c.category)}`} />
                               <span className="truncate">{c.name}</span>
+                              {c.guestCount > 1 && (
+                                <span className="text-[9px] px-1 rounded bg-black/10 font-bold flex-shrink-0">
+                                  x{c.guestCount}
+                                </span>
+                              )}
                             </div>
                             <div className="text-[10px] opacity-80 pl-2.5 truncate">
-                              {c.time} • {c.categoryName}
+                              {c.time} • {c.categoryName} {c.locationType === 'home' ? '(Tại nhà)' : ''}
                             </div>
                           </div>
                         );
@@ -536,10 +541,15 @@ export default function CalendarGrid() {
                       >
                         <div className="flex items-center gap-1.5 leading-tight">
                           <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${getDotColor(booking.category)}`} />
-                          <span className="font-semibold text-truncate">{booking.name}</span>
+                          <span className="font-semibold truncate">{booking.name}</span>
+                          {booking.guestCount > 1 && (
+                            <span className="text-[9px] px-1 rounded bg-black/10 font-bold flex-shrink-0">
+                              x{booking.guestCount}
+                            </span>
+                          )}
                         </div>
-                        <div className="text-[10px] opacity-80 pl-3">
-                          {booking.categoryName} | {booking.time}
+                        <div className="text-[10px] opacity-80 pl-3 truncate">
+                          {booking.categoryName} | {booking.time} {booking.locationType === 'home' ? '• Tại nhà' : '• Tại shop'}
                         </div>
                       </button>
                     );

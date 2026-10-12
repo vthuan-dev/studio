@@ -258,14 +258,29 @@ export default function MobileDayTimeView() {
                     className={`bg-white p-3 rounded-2xl border ${getBorderColor(cust.category)} shadow-xs flex items-center justify-between cursor-pointer hover:shadow-sm transition-all`}
                   >
                     <div>
-                      <div className="font-bold text-xs text-[#2C2420]">
-                        {cust.name}{' '}
+                      <div className="font-bold text-xs text-[#2C2420] flex items-center gap-1.5 flex-wrap">
+                        <span>{cust.name}</span>
+                        {cust.guestCount > 1 && (
+                          <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-[#FAF7F2] border border-[#E5DCD0] text-[#8D5B4C] font-bold">
+                            x{cust.guestCount}
+                          </span>
+                        )}
                         <span className="font-normal text-[#8C7E74]">
                           ({cust.categoryName || cust.type || 'Khách'})
                         </span>
+                        {cust.locationType === 'home' ? (
+                          <span className="text-[9px] px-1 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 font-medium">
+                            Tại nhà
+                          </span>
+                        ) : (
+                          <span className="text-[9px] px-1 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium">
+                            Tại shop
+                          </span>
+                        )}
                       </div>
                       <div className="text-[10px] text-[#8C7E74] mt-0.5">
                         {cust.phone} {cust.time ? `• ${cust.time}` : ''}
+                        {cust.locationType === 'home' && cust.address ? ` • ${cust.address}` : ''}
                       </div>
                       <div className="text-[10px] text-[#5A4F48] font-medium mt-0.5 line-clamp-1">
                         {Array.isArray(cust.services) ? cust.services.join(', ') : (cust.service || 'Makeup')}

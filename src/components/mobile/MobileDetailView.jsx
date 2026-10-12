@@ -9,7 +9,10 @@ import {
   User, 
   Plus, 
   CheckCheck, 
-  PlusCircle 
+  PlusCircle,
+  Store,
+  Home,
+  Users
 } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 
@@ -42,6 +45,8 @@ export default function MobileDetailView() {
     name,
     phone,
     address,
+    locationType,
+    guestCount,
     date,
     time,
     categoryName,
@@ -118,9 +123,29 @@ export default function MobileDetailView() {
             <span className="font-semibold">{phone}</span>
           </div>
 
+          {/* Địa điểm làm việc */}
           <div className="flex items-center gap-2.5">
-            <MapPin className="w-4 h-4 text-[#8D5B4C] flex-shrink-0" />
-            <span>{address}</span>
+            {locationType === 'home' ? (
+              <>
+                <Home className="w-4 h-4 text-[#8D5B4C] flex-shrink-0" />
+                <span>Make tại nhà: <strong className="text-[#2C2420]">{address || 'Chưa nhập địa chỉ'}</strong></span>
+              </>
+            ) : (
+              <>
+                <Store className="w-4 h-4 text-[#8D5B4C] flex-shrink-0" />
+                <span className="font-medium text-[#2E7D32] bg-[#E8F5E9] px-2 py-0.5 rounded-md border border-[#C8E6C9]">
+                  Make tại cửa hàng (Studio)
+                </span>
+              </>
+            )}
+          </div>
+
+          {/* Số lượng khách */}
+          <div className="flex items-center gap-2.5">
+            <Users className="w-4 h-4 text-[#8D5B4C] flex-shrink-0" />
+            <span>
+              Số lượng: <strong className="text-[#2C2420]">{guestCount || 1} khách</strong>
+            </span>
           </div>
 
           <div className="flex items-center gap-2.5">

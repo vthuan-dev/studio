@@ -90,9 +90,23 @@ export default function MobileListView() {
               className="bg-white p-3.5 rounded-2xl border border-[#EFE8DE] shadow-xs flex items-center justify-between cursor-pointer hover:border-[#8D5B4C]/40 transition-all"
             >
               <div>
-                <div className="font-bold text-xs text-[#2C2420] flex items-center gap-1.5">
+                <div className="font-bold text-xs text-[#2C2420] flex items-center gap-1.5 flex-wrap">
                   {c.name}
+                  {c.guestCount > 1 && (
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-[#FAF7F2] border border-[#E5DCD0] text-[#8D5B4C] font-bold">
+                      x{c.guestCount}
+                    </span>
+                  )}
                   <ServiceBadge category={c.category} text={c.categoryName} size="xs" />
+                  {c.locationType === 'home' ? (
+                    <span className="text-[9px] px-1 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
+                      Tại nhà
+                    </span>
+                  ) : (
+                    <span className="text-[9px] px-1 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      Tại shop
+                    </span>
+                  )}
                 </div>
                 <div className="text-[10px] text-[#8C7E74] mt-0.5">
                   {c.phone} • {c.date} ({c.time})

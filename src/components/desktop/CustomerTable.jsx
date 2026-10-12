@@ -208,9 +208,25 @@ export default function CustomerTable() {
                     </td>
 
                     <td className="py-3.5 px-3">
-                      <span className="font-semibold text-[#2C2420]">
-                        {c.name}
-                      </span>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-semibold text-[#2C2420]">
+                          {c.name}
+                        </span>
+                        {c.guestCount > 1 && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-[#FAF7F2] border border-[#E5DCD0] text-[#8D5B4C] font-bold" title={`${c.guestCount} khách`}>
+                            x{c.guestCount}
+                          </span>
+                        )}
+                        {c.locationType === 'home' ? (
+                          <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200 font-medium" title={`Make tại nhà: ${c.address || ''}`}>
+                            Tại nhà
+                          </span>
+                        ) : (
+                          <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium" title="Make tại shop / studio">
+                            Tại shop
+                          </span>
+                        )}
+                      </div>
                     </td>
 
                     <td className="py-3.5 px-3 text-[#5A4F48]">

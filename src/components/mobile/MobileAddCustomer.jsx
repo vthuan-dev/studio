@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, Calendar, Clock, Check, User, MapPin } from 'lucide-react';
+import { ChevronLeft, Calendar, Clock, Check, User, MapPin, Store, Home, Users, Minus, Plus } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 
 export default function MobileAddCustomer() {
@@ -8,7 +8,9 @@ export default function MobileAddCustomer() {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
-    address: '',
+    locationType: 'studio', // 'studio' | 'home'
+    guestCount: 1,
+    address: 'Tại cửa hàng',
     date: selectedDate || new Date().toISOString().split('T')[0],
     time: '08:00',
     category: 'co-dau',
@@ -62,6 +64,8 @@ export default function MobileAddCustomer() {
 
     addCustomer({
       ...formData,
+      guestCount: Math.max(1, Number(formData.guestCount) || 1),
+      address: formData.locationType === 'studio' ? 'Tại cửa hàng' : (formData.address || 'Tại nhà khách'),
       categoryName,
       totalAmount: Number(formData.totalAmount) || 0,
       depositAmount: Number(formData.depositAmount) || 0,
@@ -123,18 +127,91 @@ export default function MobileAddCustomer() {
               />
             </div>
 
+            {/* Số lượng khách */}
             <div>
-              <label className="text-[10px] text-[#8C7E74] font-medium block mb-1">Địa chỉ</label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  placeholder="VD: Thường Tín, Hà Nội"
-                  className="w-full bg-[#FAF7F2] border border-[#EFE8DE] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#8D5B4C]"
-                />
+              <label className="text-[10px] text-[#8C7E74] font-medium block mb-1">Số lượng khách</label>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center bg-[#FAF7F2] border border-[#EFE8DE] rounded-xl p-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, guestCount: Math.max(1, (Number(prev.guestCount) || 1) - 1) }))}
+                    className="w-7 h-7 rounded-lg hover:bg-white flex items-center justify-center text-[#8D5B4C] font-bold"
+                  >
+                    <Minus className="w-3.5 h-3.5" />
+                  </button>
+                  <input
+                    type="number"
+                    min="1"
+                    value={formData.guestCount}
+                    onChange={(e) => setFormData({ ...formData, guestCount: Math.max(1, parseInt(e.target.value, 10) || 1) })}
+                    className="w-10 text-center bg-transparent py-1 text-xs font-bold text-[#2C2420] focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, guestCount: (Number(prev.guestCount) || 1) + 1 }))}
+                    className="w-7 h-7 rounded-lg hover:bg-white flex items-center justify-center text-[#8D5B4C] font-bold"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                <span className="text-xs font-semibold text-[#6C5F57]">
+                  {formData.guestCount > 1 ? `${formData.guestCount} người` : '1 người'}
+                </span>
               </div>
             </div>
+
+            {/* Địa điểm làm việc */}
+            <div>
+              <label className="text-[10px] text-[#8C7E74] font-medium block mb-1">Địa điểm làm việc</label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, locationType: 'studio', address: 'Tại cửa hàng' }))}
+                  className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl border font-semibold text-xs transition-all ${
+                    formData.locationType === 'studio'
+                      ? 'bg-[#8D5B4C] text-white border-[#8D5B4C] shadow-xs'
+                      : 'bg-[#FAF7F2] text-[#6C5F57] border-[#EFE8DE]'
+                  }`}
+                >
+                  <Store className="w-3.5 h-3.5" />
+                  <span>Make tại cửa hàng</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, locationType: 'home', address: prev.address === 'Tại cửa hàng' ? '' : prev.address }))}
+                  className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl border font-semibold text-xs transition-all ${
+                    formData.locationType === 'home'
+                      ? 'bg-[#8D5B4C] text-white border-[#8D5B4C] shadow-xs'
+                      : 'bg-[#FAF7F2] text-[#6C5F57] border-[#EFE8DE]'
+                  }`}
+                >
+                  <Home className="w-3.5 h-3.5" />
+                  <span>Make tại nhà khách</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Điều kiện ô địa chỉ */}
+            {formData.locationType === 'home' ? (
+              <div>
+                <label className="text-[10px] text-[#8C7E74] font-medium block mb-1">Địa chỉ nhà khách *</label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={formData.address === 'Tại cửa hàng' ? '' : formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    placeholder="VD: Thường Tín, Hà Nội"
+                    className="w-full bg-[#FAF7F2] border border-[#EFE8DE] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#8D5B4C]"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="p-2.5 bg-[#FAF7F2] rounded-xl border border-[#EFE8DE] flex items-center gap-2 text-[#8D5B4C] text-[11px]">
+                <Store className="w-3.5 h-3.5 flex-shrink-0" />
+                <span>Khách đến trực tiếp cửa hàng / studio làm dịch vụ.</span>
+              </div>
+            )}
           </div>
         </div>
 

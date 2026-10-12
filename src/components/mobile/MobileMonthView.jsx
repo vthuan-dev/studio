@@ -388,12 +388,27 @@ export default function MobileMonthView() {
                     <span className="font-bold text-xs text-[#2C2420] truncate">
                       {b.name}
                     </span>
+                    {b.guestCount > 1 && (
+                      <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-[#FAF7F2] border border-[#E5DCD0] text-[#8D5B4C] font-bold">
+                        x{b.guestCount}
+                      </span>
+                    )}
                     <span className={`text-[9px] px-1.5 py-0.5 rounded font-semibold border ${getStyleByCategory(b.category)}`}>
                       {b.categoryName}
                     </span>
+                    {b.locationType === 'home' ? (
+                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 font-medium">
+                        Tại nhà
+                      </span>
+                    ) : (
+                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium">
+                        Tại shop
+                      </span>
+                    )}
                   </div>
                   <div className="text-[11px] text-[#6C5F57] truncate">
-                    {b.phone ? `${b.phone} • ` : ''}{b.address || ''}
+                    {b.phone ? `${b.phone} • ` : ''}
+                    {b.locationType === 'home' ? (b.address || 'Tại nhà') : 'Tại cửa hàng'}
                   </div>
                   {(b.staffMakeup || b.staffHair) && (
                     <div className="text-[10px] text-[#8C7E74] mt-1 flex items-center gap-1.5">

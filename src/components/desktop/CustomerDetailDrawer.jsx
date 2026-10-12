@@ -12,7 +12,10 @@ import {
   Trash2, 
   CheckCheck,
   PlusCircle,
-  Sparkles
+  Sparkles,
+  Store,
+  Home,
+  Users
 } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 import { ServiceBadge, StatusBadge } from '../common/Badge';
@@ -54,6 +57,8 @@ export default function CustomerDetailDrawer() {
     name,
     phone,
     address,
+    locationType,
+    guestCount,
     date,
     time,
     category,
@@ -92,12 +97,30 @@ export default function CustomerDetailDrawer() {
           </a>
         </div>
 
-        {address && (
-          <div className="flex items-center gap-2.5 text-[#5A4F48]">
-            <MapPin className="w-4 h-4 text-[#8D5B4C] flex-shrink-0" />
-            <span>{address}</span>
-          </div>
-        )}
+        {/* Địa điểm làm việc */}
+        <div className="flex items-center gap-2.5 text-[#5A4F48]">
+          {locationType === 'home' ? (
+            <>
+              <Home className="w-4 h-4 text-[#8D5B4C] flex-shrink-0" />
+              <span>Make tại nhà: <strong className="text-[#2C2420]">{address || 'Chưa nhập địa chỉ'}</strong></span>
+            </>
+          ) : (
+            <>
+              <Store className="w-4 h-4 text-[#8D5B4C] flex-shrink-0" />
+              <span className="font-medium text-[#2E7D32] bg-[#E8F5E9] px-2 py-0.5 rounded-md border border-[#C8E6C9]">
+                Make tại cửa hàng (Studio)
+              </span>
+            </>
+          )}
+        </div>
+
+        {/* Số lượng khách */}
+        <div className="flex items-center gap-2.5 text-[#5A4F48]">
+          <Users className="w-4 h-4 text-[#8D5B4C] flex-shrink-0" />
+          <span>
+            Số lượng: <strong className="text-[#2C2420]">{guestCount || 1} khách</strong>
+          </span>
+        </div>
 
         <div className="flex items-center gap-2.5 text-[#5A4F48]">
           <Calendar className="w-4 h-4 text-[#8D5B4C] flex-shrink-0" />
