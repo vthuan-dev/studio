@@ -56,6 +56,9 @@ export default function CalendarGrid() {
       });
     }
 
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
     // Current month cells
     for (let d = 1; d <= daysInMonth; d++) {
       const fullDate = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
@@ -63,7 +66,7 @@ export default function CalendarGrid() {
         day: d,
         isCurrentMonth: true,
         fullDate,
-        isSelectedMockDay: fullDate === '2026-11-05'
+        isToday: fullDate === todayStr
       });
     }
 
@@ -78,7 +81,7 @@ export default function CalendarGrid() {
         day: d,
         isCurrentMonth: false,
         fullDate,
-        isSelectedMockDay: false
+        isToday: fullDate === todayStr
       });
     }
 
@@ -87,7 +90,9 @@ export default function CalendarGrid() {
 
   // Compute 7 days of the week around selectedDate
   const weekDaysData = useMemo(() => {
-    const [y, m, d] = (selectedDate || '2026-11-05').split('-').map(Number);
+    const today = new Date();
+    const defaultTodayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    const [y, m, d] = (selectedDate || defaultTodayStr).split('-').map(Number);
     const curr = new Date(y, m - 1, d);
     const dayOfWeek = curr.getDay(); // 0 is Sunday, 1 is Monday...
     const diffToMon = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
@@ -423,7 +428,9 @@ export default function CalendarGrid() {
         {weekDays.map((w, idx) => (
           <div 
             key={idx} 
-            className="py-3 text-xs font-semibold text-[#6C5F57] border-r border-[#EFE8DE] last:border-r-0"
+            className={`py-3 text-xs font-semibold border-r border-[#EFE8DE] last:border-r-0 ${
+              idx === 6 ? 'text-[#D32F2F]' : 'text-[#6C5F57]'
+            }`}
           >
             {w}
           </div>
@@ -456,12 +463,12 @@ export default function CalendarGrid() {
               <div className="flex items-center justify-between mb-1.5">
                 <span
                   className={`inline-flex items-center justify-center text-xs font-semibold transition-all ${
-                    cell.isSelectedMockDay
+                    cell.isToday
                       ? 'w-6 h-6 rounded-full bg-[#8D5B4C] text-white shadow-xs'
                       : isSelectedDay
                       ? 'w-6 h-6 rounded-full bg-[#E5DCD0] text-[#2C2420]'
                       : cell.isCurrentMonth
-                      ? 'text-[#2C2420] pl-1'
+                      ? (idx % 7 === 6 ? 'text-[#D32F2F] pl-1 font-semibold' : 'text-[#2C2420] pl-1')
                       : 'text-[#B8AEA4] pl-1'
                   }`}
                 >

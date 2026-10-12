@@ -110,7 +110,9 @@ export default function TopHeader() {
 
   const getHeaderTitle = () => {
     if (calendarView === 'day') {
-      const [y, m, d] = (selectedDate || '2026-11-05').split('-');
+      const now = new Date();
+      const defaultDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      const [y, m, d] = (selectedDate || defaultDate).split('-');
       return `Ngày ${d}/${m}/${y}`;
     }
     if (calendarView === 'week') {

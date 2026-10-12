@@ -12,14 +12,22 @@ export default function CustomerModal() {
     addCustomer,
     updateCustomer,
     staffList,
-    setIsStaffModalOpen
+    setIsStaffModalOpen,
+    selectedDate
   } = useStudio();
+
+  const getTodayStr = () => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  };
+
+  const defaultDate = selectedDate || getTodayStr();
 
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
     address: 'Hà Nội',
-    date: '2026-11-05',
+    date: defaultDate,
     time: '06:00',
     category: 'co-dau',
     services: ['Makeup cô dâu', 'Làm tóc'],
@@ -31,12 +39,13 @@ export default function CustomerModal() {
   });
 
   useEffect(() => {
+    const currentDefDate = selectedDate || getTodayStr();
     if (editingCustomer && !editingCustomer._isNew) {
       setFormData({
         name: editingCustomer.name || '',
         phone: editingCustomer.phone || '',
         address: editingCustomer.address || '',
-        date: editingCustomer.date || '2026-11-05',
+        date: editingCustomer.date || currentDefDate,
         time: editingCustomer.time || '06:00',
         category: editingCustomer.category || 'co-dau',
         services: editingCustomer.services || ['Makeup cô dâu'],
@@ -51,7 +60,7 @@ export default function CustomerModal() {
         name: '',
         phone: '',
         address: 'Hà Nội',
-        date: editingCustomer.date || '2026-11-05',
+        date: editingCustomer.date || currentDefDate,
         time: editingCustomer.time || '06:00',
         category: 'co-dau',
         services: ['Makeup cô dâu', 'Làm tóc'],
@@ -65,8 +74,8 @@ export default function CustomerModal() {
       setFormData({
         name: '',
         phone: '',
-        address: 'Thường Tín, Hà Nội',
-        date: '2026-11-05',
+        address: 'Hà Nội',
+        date: currentDefDate,
         time: '06:00',
         category: 'co-dau',
         services: ['Makeup cô dâu', 'Làm tóc'],
@@ -77,7 +86,7 @@ export default function CustomerModal() {
         note: 'Tone nhẹ nhàng, trong trẻo. Có thuê phụ kiện.'
       });
     }
-  }, [editingCustomer, isCustomerModalOpen]);
+  }, [editingCustomer, isCustomerModalOpen, selectedDate]);
 
   if (!isCustomerModalOpen) return null;
 

@@ -157,10 +157,17 @@ export function StudioProvider({ children }) {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   
-  // Current calendar month (November 2026 as in mockup)
-  const [currentYear, setCurrentYear] = useState(2026);
-  const [currentMonth, setCurrentMonth] = useState(11); // 1-12
-  const [selectedDate, setSelectedDate] = useState('2026-11-05'); // Day highlighted in mockup
+  // Dynamic initialization from real date
+  const initialDateObj = useMemo(() => new Date(), []);
+  const initialYear = initialDateObj.getFullYear();
+  const initialMonth = initialDateObj.getMonth() + 1;
+  const initialDayStr = String(initialDateObj.getDate()).padStart(2, '0');
+  const initialDateStr = `${initialYear}-${String(initialMonth).padStart(2, '0')}-${initialDayStr}`;
+
+  // Current calendar month & selected date
+  const [currentYear, setCurrentYear] = useState(initialYear);
+  const [currentMonth, setCurrentMonth] = useState(initialMonth); // 1-12
+  const [selectedDate, setSelectedDate] = useState(initialDateStr);
 
   // Selected customer for side panel / detail view
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
@@ -292,10 +299,15 @@ export function StudioProvider({ children }) {
   };
 
   const navigateToday = () => {
-    setCurrentYear(2026);
-    setCurrentMonth(11);
-    setSelectedDate('2026-11-05');
-    showToast('Đã quay về hôm nay (05/11/2026)');
+    const today = new Date();
+    const y = today.getFullYear();
+    const m = today.getMonth() + 1;
+    const d = String(today.getDate()).padStart(2, '0');
+    const dStr = `${y}-${String(m).padStart(2, '0')}-${d}`;
+    setCurrentYear(y);
+    setCurrentMonth(m);
+    setSelectedDate(dStr);
+    showToast(`Đã quay về hôm nay (${d}/${String(m).padStart(2, '0')}/${y})`);
   };
 
   // Selected customer object

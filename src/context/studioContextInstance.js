@@ -1,16 +1,22 @@
 import { createContext } from 'react';
 
+const now = new Date();
+const defaultYear = now.getFullYear();
+const defaultMonth = now.getMonth() + 1;
+const defaultDay = String(now.getDate()).padStart(2, '0');
+const defaultDateStr = `${defaultYear}-${String(defaultMonth).padStart(2, '0')}-${defaultDay}`;
+
 export const defaultStudioContext = {
   customers: [],
   filteredCustomers: [],
   selectedCustomerId: null,
   setSelectedCustomerId: () => {},
   selectedCustomer: null,
-  currentYear: 2026,
+  currentYear: defaultYear,
   setCurrentYear: () => {},
-  currentMonth: 11,
+  currentMonth: defaultMonth,
   setCurrentMonth: () => {},
-  selectedDate: '2026-11-05',
+  selectedDate: defaultDateStr,
   setSelectedDate: () => {},
   calendarView: 'month',
   setCalendarView: () => {},
