@@ -23,7 +23,14 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
-      const payload = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+      let payload = req.body;
+      if (typeof payload === 'string') {
+        try {
+          payload = JSON.parse(payload);
+        } catch {
+          payload = {};
+        }
+      }
       const customers = Array.isArray(payload) ? payload : payload?.customers;
 
       if (Array.isArray(customers)) {

@@ -32,7 +32,14 @@ export default async function handler(req, res) {
 
     // POST /api/auth -> Đăng nhập, Đăng xuất, Đổi mật khẩu
     if (req.method === 'POST') {
-      const payload = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+      let payload = req.body;
+      if (typeof payload === 'string') {
+        try {
+          payload = JSON.parse(payload);
+        } catch {
+          payload = {};
+        }
+      }
       const { action = 'login', username, password, newPassword } = payload || {};
 
       // 1. Đăng xuất

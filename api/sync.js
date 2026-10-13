@@ -60,7 +60,14 @@ export default async function handler(req, res) {
 
     // POST or PUT /api/sync -> Đồng bộ ghi dữ liệu vào MongoDB Atlas
     if (req.method === 'POST' || req.method === 'PUT') {
-      const payload = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+      let payload = req.body;
+      if (typeof payload === 'string') {
+        try {
+          payload = JSON.parse(payload);
+        } catch {
+          payload = {};
+        }
+      }
       const { customers, staffList, servicesList, accessoriesList, userProfile, updatedAt = Date.now() } = payload || {};
 
       const operations = [];
