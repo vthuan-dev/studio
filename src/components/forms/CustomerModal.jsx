@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Sparkles, User, Calendar, Clock, DollarSign, Check, Store, Home, Users, Minus, Plus } from 'lucide-react';
+import { X, Sparkles, User, Calendar, Clock, DollarSign, Check, Store, Home, Users, Minus, Plus, Trash2 } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 import { STAFFS } from '../../data/mockData';
 import VietnamAddressSelect from './VietnamAddressSelect';
@@ -11,6 +11,7 @@ export default function CustomerModal() {
     editingCustomer,
     addCustomer,
     updateCustomer,
+    requestDeleteCustomer,
     staffList,
     setIsStaffModalOpen,
     selectedDate
@@ -166,12 +167,24 @@ export default function CustomerModal() {
             </h3>
             <p className="text-xs text-[#8C7E74]">MEYZI STUDIO MAKEUP & HAIR</p>
           </div>
-          <button
-            onClick={() => setIsCustomerModalOpen(false)}
-            className="p-2 rounded-full hover:bg-[#FAF7F2] text-[#8C7E74] transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-1.5">
+            {editingCustomer && !editingCustomer._isNew && (
+              <button
+                type="button"
+                onClick={() => requestDeleteCustomer(editingCustomer)}
+                className="p-2 rounded-full hover:bg-[#FFEBEE] text-[#C62828] transition-colors"
+                title="Xóa lịch hẹn này"
+              >
+                <Trash2 className="w-5 h-5" />
+              </button>
+            )}
+            <button
+              onClick={() => setIsCustomerModalOpen(false)}
+              className="p-2 rounded-full hover:bg-[#FAF7F2] text-[#8C7E74] transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Form Body matching Screen 3 in Image 1 */}
@@ -483,7 +496,18 @@ export default function CustomerModal() {
           </div>
 
           {/* Buttons */}
-          <div className="pt-4 border-t border-[#EFE8DE] flex gap-3">
+          <div className="pt-4 border-t border-[#EFE8DE] flex items-center gap-2.5">
+            {editingCustomer && !editingCustomer._isNew && (
+              <button
+                type="button"
+                onClick={() => requestDeleteCustomer(editingCustomer)}
+                className="py-3 px-3.5 rounded-xl font-semibold text-xs text-[#C62828] bg-[#FFEBEE] hover:bg-[#FFCDD2] border border-[#FFCDD2] transition-colors flex items-center justify-center gap-1.5"
+                title="Xóa lịch hẹn này"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span className="hidden sm:inline">Xóa lịch hẹn</span>
+              </button>
+            )}
             <button
               type="button"
               onClick={() => setIsCustomerModalOpen(false)}

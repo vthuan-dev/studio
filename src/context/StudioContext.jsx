@@ -296,6 +296,8 @@ export function StudioProvider({ children }) {
   const [isStaffModalOpen, setIsStaffModalOpen] = useState(false);
   const [isServicesModalOpen, setIsServicesModalOpen] = useState(false);
   const [isAccessoriesModalOpen, setIsAccessoriesModalOpen] = useState(false);
+  const [deleteTargetCustomer, setDeleteTargetCustomer] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const updateUserProfile = (newProfile) => {
     setUserProfile(newProfile);
@@ -539,14 +541,54 @@ export function StudioProvider({ children }) {
     }));
   };
 
-  const deleteCustomer = (id) => {
-    if (confirm('Bạn có chắc muốn xóa khách hàng này?')) {
-      setCustomers(prev => prev.filter(c => c.id !== id));
-      if (selectedCustomerId === id) {
-        const remaining = customers.filter(c => c.id !== id);
-        setSelectedCustomerId(remaining.length > 0 ? remaining[0].id : null);
-      }
+  const requestDeleteCustomer = (customerOrId) => {
+    if (!customerOrId) return;
+    const target = typeof customerOrId === 'object'
+      ? customerOrId
+      : customers.find(c => c.id === customerOrId);
+    if (!target) return;
+    setDeleteTargetCustomer(target);
+    setIsDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setDeleteTargetCustomer(null);
+  };
+
+  const confirmDeleteCustomer = () => {
+    if (!deleteTargetCustomer) return;
+    const targetId = deleteTargetCustomer.id;
+    const targetName = deleteTargetCustomer.name || 'Khách hàng';
+
+    // 1. Remove from customers list (triggers automatic autosave & cloudSync)
+    setCustomers(prev => prev.filter(c => c.id !== targetId));
+
+    // 2. Clear selected customer if it was the deleted one
+    if (selectedCustomerId === targetId) {
+      setSelectedCustomerId(null);
     }
+
+    // 3. Close customer modal if currently editing this customer
+    if (editingCustomer && editingCustomer.id === targetId) {
+      setIsCustomerModalOpen(false);
+      setEditingCustomer(null);
+    }
+
+    // 4. Return to calendar if on mobile detail screen
+    if (mobileScreen === 'detail') {
+      setMobileScreen('calendar');
+    }
+
+    // 5. Close confirmation modal
+    closeDeleteModal();
+
+    // 6. Show toast notification
+    showToast(`Đã xóa lịch hẹn của khách "${targetName}" thành công!`, 'info');
+  };
+
+  const deleteCustomer = (id) => {
+    requestDeleteCustomer(id);
   };
 
   const recordPayment = (id, additionalAmount, note = 'Thu thêm') => {
@@ -827,6 +869,11 @@ export function StudioProvider({ children }) {
         addCustomer,
         updateCustomer,
         deleteCustomer,
+        deleteTargetCustomer,
+        isDeleteModalOpen,
+        requestDeleteCustomer,
+        closeDeleteModal,
+        confirmDeleteCustomer,
         recordPayment,
         settleFullPayment,
         resetData,

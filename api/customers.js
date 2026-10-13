@@ -2,7 +2,7 @@ import { connectToDatabase } from './_lib/mongodb.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
@@ -36,6 +36,15 @@ export default async function handler(req, res) {
       }
 
       return res.status(400).json({ error: 'Payload must be an array of customers' });
+    }
+
+    if (req.method === 'DELETE') {
+      const targetId = req.query?.id || (req.body ? (typeof req.body === 'string' ? JSON.parse(req.body)?.id : req.body?.id) : null);
+      if (!targetId) {
+        return res.status(400).json({ error: 'Customer ID is required for deletion' });
+      }
+      await customersCol.deleteOne({ id: String(targetId) });
+      return res.status(200).json({ success: true, deletedId: targetId });
     }
 
     return res.status(405).json({ error: 'Method not allowed' });

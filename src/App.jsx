@@ -19,6 +19,7 @@ import InvoiceModal from './components/common/InvoiceModal';
 import StaffModal from './components/common/StaffModal';
 import ServicesModal from './components/common/ServicesModal';
 import AccessoriesModal from './components/common/AccessoriesModal';
+import DeleteConfirmModal from './components/common/DeleteConfirmModal';
 import Toast from './components/common/Toast';
 import LoginScreen from './components/common/LoginScreen';
 
@@ -96,6 +97,7 @@ function StudioApp() {
       <StaffModal />
       <ServicesModal />
       <AccessoriesModal />
+      <DeleteConfirmModal />
       <Toast toast={toast} onClose={() => showToast('', 'info')} />
     </>
   );

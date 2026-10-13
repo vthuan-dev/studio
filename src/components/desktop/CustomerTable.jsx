@@ -27,6 +27,7 @@ export default function CustomerTable() {
     openAddModal,
     openEditModal,
     deleteCustomer,
+    requestDeleteCustomer,
     selectedCustomerId,
     setSelectedCustomerId,
     stats,
@@ -293,7 +294,7 @@ export default function CustomerTable() {
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
                         <button
-                          onClick={() => deleteCustomer(c.id)}
+                          onClick={() => requestDeleteCustomer(c)}
                           className="p-1.5 hover:bg-[#FFEBEE] rounded-lg text-[#6C5F57] hover:text-[#C62828] transition-colors"
                           title="Xóa khách"
                         >

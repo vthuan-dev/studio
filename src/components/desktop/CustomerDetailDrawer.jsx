@@ -25,7 +25,7 @@ export default function CustomerDetailDrawer() {
     selectedCustomer, 
     openAddModal,
     openEditModal, 
-    deleteCustomer, 
+    requestDeleteCustomer, 
     setIsPaymentModalOpen,
     settleFullPayment,
     setIsInvoiceModalOpen
@@ -265,7 +265,7 @@ export default function CustomerDetailDrawer() {
         </button>
 
         <button
-          onClick={() => deleteCustomer(id)}
+          onClick={() => requestDeleteCustomer(selectedCustomer)}
           className="p-2.5 rounded-xl text-xs font-semibold text-[#C62828] bg-[#FFEBEE] hover:bg-[#FFCDD2] border border-[#FFCDD2] transition-colors"
           title="Xóa khách hàng"
         >

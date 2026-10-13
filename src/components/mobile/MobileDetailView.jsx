@@ -12,7 +12,8 @@ import {
   PlusCircle,
   Store,
   Home,
-  Users
+  Users,
+  Trash2
 } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 
@@ -23,7 +24,8 @@ export default function MobileDetailView() {
     openEditModal, 
     recordPayment, 
     settleFullPayment,
-    setIsPaymentModalOpen 
+    setIsPaymentModalOpen,
+    requestDeleteCustomer 
   } = useStudio();
 
   if (!selectedCustomer) {
@@ -73,12 +75,21 @@ export default function MobileDetailView() {
           <span>Chi tiết khách</span>
         </button>
 
-        <button 
-          onClick={() => openEditModal(selectedCustomer)}
-          className="font-bold text-sm text-[#8D5B4C] hover:underline"
-        >
-          Sửa
-        </button>
+        <div className="flex items-center gap-1.5">
+          <button 
+            onClick={() => requestDeleteCustomer(selectedCustomer)}
+            className="p-1.5 hover:bg-[#FFEBEE] rounded-lg text-[#C62828] transition-colors"
+            title="Xóa lịch hẹn"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+          <button 
+            onClick={() => openEditModal(selectedCustomer)}
+            className="font-bold text-sm text-[#8D5B4C] hover:underline px-1.5 py-1"
+          >
+            Sửa
+          </button>
+        </div>
       </div>
 
       {/* Body content */}
@@ -251,6 +262,17 @@ export default function MobileDetailView() {
           ) : (
             <p className="text-[11px] text-[#8C7E74] italic">Chưa có giao dịch thanh toán nào.</p>
           )}
+        </div>
+
+        {/* Nút Xóa Lịch Hẹn */}
+        <div className="pt-2">
+          <button
+            onClick={() => requestDeleteCustomer(selectedCustomer)}
+            className="w-full py-3 px-4 rounded-2xl font-bold text-xs text-[#C62828] bg-[#FFEBEE] hover:bg-[#FFCDD2] border border-[#FFCDD2] flex items-center justify-center gap-2 shadow-2xs transition-colors"
+          >
+            <Trash2 className="w-4 h-4" />
+            <span>Xóa lịch hẹn này</span>
+          </button>
         </div>
       </div>
     </div>
