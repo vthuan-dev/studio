@@ -11,7 +11,10 @@ import {
   Users, 
   MoreHorizontal,
   Clock,
-  Sparkles
+  Sparkles,
+  Cloud,
+  CloudOff,
+  RefreshCw
 } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 import MobileDrawer from './MobileDrawer';
@@ -35,7 +38,10 @@ export default function MobileMonthView() {
     navigatePrev,
     navigateNext,
     navigateToday,
-    openAddModal
+    openAddModal,
+    syncStatus,
+    syncNow,
+    lastSyncedAt
   } = useStudio();
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -179,13 +185,38 @@ export default function MobileMonthView() {
 
         <BrandLogo size="sm" layout="horizontal" />
 
-        <button 
-          onClick={() => setIsNotificationOpen(true)}
-          className="p-1 relative hover:bg-[#FAF7F2] rounded-lg"
-          title="Thông báo & Nhắc lịch"
-        >
-          <Bell className="w-5 h-5 text-[#2C2420]" />
-        </button>
+        <div className="flex items-center gap-1.5">
+          <button 
+            onClick={syncNow}
+            className="p-1 relative hover:bg-[#FAF7F2] rounded-lg text-[#6C5F57] cursor-pointer"
+            title={
+              syncStatus === 'syncing'
+                ? 'Đang đồng bộ đám mây...'
+                : syncStatus === 'error'
+                ? 'Lỗi kết nối - Bấm để thử lại'
+                : `Đã đồng bộ${lastSyncedAt ? ` (${lastSyncedAt.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })})` : ''} - Bấm để đồng bộ ngay`
+            }
+          >
+            {syncStatus === 'syncing' ? (
+              <RefreshCw className="w-4 h-4 text-[#8D5B4C] animate-spin" />
+            ) : syncStatus === 'error' ? (
+              <CloudOff className="w-4 h-4 text-red-500" />
+            ) : (
+              <div className="relative">
+                <Cloud className="w-4 h-4 text-[#2E7D32]" />
+                <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-[#2E7D32] rounded-full"></span>
+              </div>
+            )}
+          </button>
+
+          <button 
+            onClick={() => setIsNotificationOpen(true)}
+            className="p-1 relative hover:bg-[#FAF7F2] rounded-lg"
+            title="Thông báo & Nhắc lịch"
+          >
+            <Bell className="w-5 h-5 text-[#2C2420]" />
+          </button>
+        </div>
       </div>
 
       <MobileDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />

@@ -100,7 +100,10 @@ export const defaultStudioContext = {
   deleteStaff: () => {},
   isAuthenticated: false,
   login: () => ({ success: false }),
-  logout: () => {}
+  logout: () => {},
+  syncStatus: 'idle', // 'idle' | 'syncing' | 'synced' | 'error'
+  lastSyncedAt: null,
+  syncNow: () => {}
 };
 
 export const StudioContext = createContext(defaultStudioContext);

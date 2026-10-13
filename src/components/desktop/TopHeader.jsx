@@ -16,7 +16,10 @@ import {
   Sparkles,
   Edit3,
   UserCheck,
-  Users
+  Users,
+  Cloud,
+  CloudOff,
+  RefreshCw
 } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 
@@ -47,7 +50,10 @@ export default function TopHeader() {
     navigateToday,
     userProfile,
     updateUserProfile,
-    logout
+    logout,
+    syncStatus,
+    lastSyncedAt,
+    syncNow
   } = useStudio();
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -310,9 +316,40 @@ export default function TopHeader() {
           <BarChart3 className="w-4 h-4 text-[#8D5B4C]" />
         </button>
 
+        {/* Cloud Sync Status & Manual Sync Button */}
+        <button
+          onClick={syncNow}
+          className={`flex items-center gap-1.5 px-2.5 py-2 rounded-xl border transition-all text-xs font-medium cursor-pointer ${
+            syncStatus === 'syncing'
+              ? 'bg-[#F5EFE6] text-[#8D5B4C] border-[#8D5B4C]/40'
+              : syncStatus === 'error'
+              ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100'
+              : 'bg-[#F5EFE6] text-[#6C5F57] hover:text-[#2C2420] hover:bg-[#EFE5D8] border-[#E5DCD0]'
+          }`}
+          title={
+            syncStatus === 'syncing'
+              ? 'Đang đồng bộ dữ liệu với máy khác qua đám mây...'
+              : syncStatus === 'error'
+              ? 'Lỗi kết nối máy chủ đám mây - Bấm để thử lại'
+              : `Đã đồng bộ đám mây đa thiết bị${lastSyncedAt ? ` (lúc ${lastSyncedAt.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })})` : ''} - Bấm để đồng bộ ngay`
+          }
+        >
+          {syncStatus === 'syncing' ? (
+            <RefreshCw className="w-3.5 h-3.5 text-[#8D5B4C] animate-spin" />
+          ) : syncStatus === 'error' ? (
+            <CloudOff className="w-3.5 h-3.5 text-red-500" />
+          ) : (
+            <Cloud className="w-3.5 h-3.5 text-[#2E7D32]" />
+          )}
+          <span className="hidden lg:inline text-[11px] font-medium">
+            {syncStatus === 'syncing'
+              ? 'Đang đồng bộ...'
+              : syncStatus === 'error'
+              ? 'Lỗi đồng bộ'
+              : 'Đã đồng bộ'}
+          </span>
+        </button>
 
-
-        {/* Notification Bell */}
         <div className="relative">
           <button 
             onClick={() => setIsNotificationOpen(true)}

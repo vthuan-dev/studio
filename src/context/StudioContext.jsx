@@ -1,13 +1,33 @@
-import React, { useContext, useState, useEffect, useMemo } from 'react';
+import React, { useContext, useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import initialCustomersJson from '../data/customers.json';
 import initialStaffJson from '../data/staff.json';
 import { STAFFS, SERVICE_CATEGORIES } from '../data/mockData';
 import { StudioContext, defaultStudioContext } from './studioContextInstance';
+import { fetchCloudData, saveCloudData } from '../utils/cloudSync';
 
 const STORAGE_KEY = 'meyzi_studio_customers_v3';
 const STAFF_STORAGE_KEY = 'meyzi_studio_staff_v1';
+const UPDATED_AT_KEY = 'meyzi_studio_updated_at';
 
 export function StudioProvider({ children }) {
+  // Toast feedback state (available globally within provider)
+  const [toast, setToast] = useState({ message: '', type: 'success', isVisible: false });
+
+  const showToast = useCallback((message, type = 'success') => {
+    setToast({ message, type, isVisible: true });
+    setTimeout(() => {
+      setToast(prev => ({ ...prev, isVisible: false }));
+    }, 3000);
+  }, []);
+
+  // Multi-device Cloud Sync State
+  const [syncStatus, setSyncStatus] = useState('idle'); // 'idle' | 'syncing' | 'synced' | 'error'
+  const [lastSyncedAt, setLastSyncedAt] = useState(null);
+
+  const localUpdatedAtRef = useRef(Number(localStorage.getItem(UPDATED_AT_KEY) || 0));
+  const isApplyingCloudUpdateRef = useRef(false);
+  const hasMountedRef = useRef(false);
+
   // Staff list with JSON and localStorage persistence (CRUD enabled)
   const [staffList, setStaffList] = useState(() => {
     try {
@@ -24,32 +44,6 @@ export function StudioProvider({ children }) {
       : STAFFS.filter(s => s.id !== 'all');
   });
 
-  // On mount: fetch latest staff from API
-  useEffect(() => {
-    fetch('/api/staff')
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
-          setStaffList(data);
-        }
-      })
-      .catch(() => {});
-  }, []);
-
-  // Save staff to localStorage & persist directly to src/data/staff.json
-  useEffect(() => {
-    try {
-      localStorage.setItem(STAFF_STORAGE_KEY, JSON.stringify(staffList));
-      fetch('/api/staff', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(staffList)
-      }).catch(() => {});
-    } catch (e) {
-      console.error('Failed to save staff data', e);
-    }
-  }, [staffList]);
-
   // Customers list with JSON and localStorage persistence
   const [customers, setCustomers] = useState(() => {
     try {
@@ -64,32 +58,131 @@ export function StudioProvider({ children }) {
     return Array.isArray(initialCustomersJson) ? initialCustomersJson : [];
   });
 
-  // On mount: fetch latest customers from JSON file via local API
-  useEffect(() => {
-    fetch('/api/customers')
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        if (Array.isArray(data)) {
-          setCustomers(data);
-        }
-      })
-      .catch(() => {});
-  }, []);
-
-  // Save to localStorage AND write directly to JSON file on disk
-  useEffect(() => {
+  // Function to pull latest data from Cloud Storage
+  const performCloudFetch = useCallback(async (isManual = false) => {
+    if (isManual) setSyncStatus('syncing');
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(customers));
-      // Persist directly to src/data/customers.json via local Vite API
-      fetch('/api/customers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(customers)
-      }).catch(() => {});
-    } catch (e) {
-      console.error('Failed to save data', e);
+      const res = await fetchCloudData();
+      if (res.success && res.data) {
+        const cloudTime = res.data.updatedAt || 0;
+        const localTime = localUpdatedAtRef.current;
+        const cloudCustomers = Array.isArray(res.data.customers) ? res.data.customers : [];
+        const cloudStaff = Array.isArray(res.data.staffList) && res.data.staffList.length > 0 ? res.data.staffList : null;
+
+        // Condition 1: Cloud is newer OR local is empty but cloud has data
+        if (cloudTime > localTime || (customers.length === 0 && cloudCustomers.length > 0)) {
+          isApplyingCloudUpdateRef.current = true;
+          setCustomers(cloudCustomers);
+          if (cloudStaff) setStaffList(cloudStaff);
+          localUpdatedAtRef.current = cloudTime;
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudCustomers));
+          if (cloudStaff) localStorage.setItem(STAFF_STORAGE_KEY, JSON.stringify(cloudStaff));
+          localStorage.setItem(UPDATED_AT_KEY, String(cloudTime));
+          setSyncStatus('synced');
+          setLastSyncedAt(new Date());
+          if (isManual) {
+            showToast(`Đã đồng bộ thành công ${cloudCustomers.length} lịch hẹn từ đám mây!`, 'success');
+          }
+        } 
+        // Condition 2: Local is newer than cloud (e.g. offline edits), push local to cloud
+        else if (localTime > cloudTime && (customers.length > 0 || localTime > 1)) {
+          setSyncStatus('syncing');
+          await saveCloudData({ customers, staffList, updatedAt: localTime });
+          setSyncStatus('synced');
+          setLastSyncedAt(new Date());
+          if (isManual) {
+            showToast('Đã tải dữ liệu mới nhất lên đám mây!', 'success');
+          }
+        } 
+        else {
+          setSyncStatus('synced');
+          setLastSyncedAt(new Date());
+          if (isManual) {
+            showToast('Dữ liệu đã ở trạng thái mới nhất!', 'info');
+          }
+        }
+      } else {
+        if (isManual) {
+          setSyncStatus('error');
+          showToast('Không thể kết nối máy chủ đám mây. Vui lòng thử lại!', 'warning');
+        }
+      }
+    } catch (err) {
+      console.error('[StudioContext] Sync error:', err);
+      if (isManual) setSyncStatus('error');
     }
-  }, [customers]);
+  }, [customers, staffList, showToast]);
+
+  // Periodic and Event-Driven Sync
+  useEffect(() => {
+    // Initial fetch on mount
+    performCloudFetch(false);
+
+    // Auto-sync when user returns to tab or window gains focus
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        performCloudFetch(false);
+      }
+    };
+    const handleFocus = () => {
+      performCloudFetch(false);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    // Background polling every 20 seconds
+    const interval = setInterval(() => {
+      performCloudFetch(false);
+    }, 20000);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+      clearInterval(interval);
+    };
+  }, [performCloudFetch]);
+
+  // Save to localStorage AND push to Cloud + local Vite API
+  useEffect(() => {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      return;
+    }
+
+    if (isApplyingCloudUpdateRef.current) {
+      isApplyingCloudUpdateRef.current = false;
+      return;
+    }
+
+    const newTimestamp = Date.now();
+    localUpdatedAtRef.current = newTimestamp;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(customers));
+    localStorage.setItem(STAFF_STORAGE_KEY, JSON.stringify(staffList));
+    localStorage.setItem(UPDATED_AT_KEY, String(newTimestamp));
+
+    setSyncStatus('syncing');
+    const timer = setTimeout(async () => {
+      try {
+        const res = await saveCloudData({ customers, staffList, updatedAt: newTimestamp });
+        if (res.success) {
+          setSyncStatus('synced');
+          setLastSyncedAt(new Date());
+        } else {
+          setSyncStatus('error');
+        }
+      } catch {
+        setSyncStatus('error');
+      }
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, [customers, staffList]);
+
+  const syncNow = useCallback(() => {
+    performCloudFetch(true);
+  }, [performCloudFetch]);
+
 
 
   // Authentication state (tk: admin, mk: 10102020)
@@ -205,9 +298,6 @@ export function StudioProvider({ children }) {
     showToast('Đã cập nhật thông tin chủ studio!', 'success');
   };
 
-  // Toast feedback
-  const [toast, setToast] = useState({ message: '', type: 'success', isVisible: false });
-
   // Section highlight pulse animation (UX attention feedback)
   const [highlightedSection, setHighlightedSection] = useState(null); // 'calendar' | 'table'
 
@@ -216,13 +306,6 @@ export function StudioProvider({ children }) {
     setTimeout(() => {
       setHighlightedSection(null);
     }, 1800);
-  };
-
-  const showToast = (message, type = 'success') => {
-    setToast({ message, type, isVisible: true });
-    setTimeout(() => {
-      setToast(prev => ({ ...prev, isVisible: false }));
-    }, 3000);
   };
 
   // Smart Navigation helpers for Header and Views
@@ -582,7 +665,13 @@ export function StudioProvider({ children }) {
       try {
         const parsed = JSON.parse(event.target.result);
         if (Array.isArray(parsed)) {
+          isApplyingCloudUpdateRef.current = false;
           setCustomers(parsed);
+          const newTimestamp = Date.now();
+          localUpdatedAtRef.current = newTimestamp;
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+          localStorage.setItem(UPDATED_AT_KEY, String(newTimestamp));
+          saveCloudData({ customers: parsed, staffList, updatedAt: newTimestamp }).catch(() => {});
           showToast(`Đã đồng bộ thành công ${parsed.length} khách hàng!`);
           setIsExportModalOpen(false);
         } else {
@@ -597,17 +686,16 @@ export function StudioProvider({ children }) {
 
   const resetData = () => {
     if (confirm('Bạn có chắc chắn muốn xóa trắng toàn bộ dữ liệu lịch hẹn để bắt đầu nhập mới?')) {
+      isApplyingCloudUpdateRef.current = false;
       setCustomers([]);
       setSelectedCustomerId(null);
+      const newTimestamp = Date.now();
+      localUpdatedAtRef.current = newTimestamp;
       try {
-        localStorage.removeItem(STORAGE_KEY);
         localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+        localStorage.setItem(UPDATED_AT_KEY, String(newTimestamp));
       } catch (e) {}
-      fetch('/api/customers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify([])
-      }).catch(() => {});
+      saveCloudData({ customers: [], staffList, updatedAt: newTimestamp }).catch(() => {});
       showToast('Đã xóa trắng toàn bộ dữ liệu. Bạn có thể bắt đầu tạo lịch mới!', 'info');
     }
   };
@@ -747,7 +835,10 @@ export function StudioProvider({ children }) {
         deleteStaff,
         isAuthenticated,
         login,
-        logout
+        logout,
+        syncStatus,
+        lastSyncedAt,
+        syncNow
       }}
     >
       {children}
