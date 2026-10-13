@@ -62,6 +62,28 @@ function jsonDbPlugin() {
     configureServer(server) {
       server.middlewares.use('/api/customers', handleJsonRoute('/api/customers', 'customers.json'))
       server.middlewares.use('/api/staff', handleJsonRoute('/api/staff', 'staff.json'))
+      server.middlewares.use('/api/sync', async (req, res, next) => {
+        try {
+          const { default: syncHandler } = await import('./api/sync.js');
+          let body = '';
+          req.on('data', chunk => { body += chunk; });
+          req.on('end', async () => {
+            try {
+              req.body = body ? JSON.parse(body) : {};
+            } catch {
+              req.body = {};
+            }
+            res.status = (code) => { res.statusCode = code; return res; };
+            res.json = (data) => {
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify(data));
+            };
+            await syncHandler(req, res);
+          });
+        } catch (e) {
+          next(e);
+        }
+      });
     }
   }
 }

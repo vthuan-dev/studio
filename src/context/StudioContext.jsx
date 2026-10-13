@@ -148,10 +148,12 @@ export function StudioProvider({ children }) {
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('focus', handleFocus);
 
-    // Background polling every 20 seconds
+    // Polling every 15 seconds when user is actively viewing tab
     const interval = setInterval(() => {
-      performCloudFetch(false);
-    }, 20000);
+      if (document.visibilityState === 'visible') {
+        performCloudFetch(false);
+      }
+    }, 15000);
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
