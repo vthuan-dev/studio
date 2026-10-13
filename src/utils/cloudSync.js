@@ -42,6 +42,7 @@ export async function fetchCloudData() {
           data: {
             customers: data.customers,
             staffList: Array.isArray(data.staffList) ? data.staffList : null,
+            userProfile: data.userProfile || null,
             updatedAt: typeof data.updatedAt === 'number' ? data.updatedAt : Date.now()
           },
           source: 'primary'
@@ -66,6 +67,7 @@ export async function fetchCloudData() {
           data: {
             customers: payload.customers,
             staffList: Array.isArray(payload.staffList) ? payload.staffList : null,
+            userProfile: payload.userProfile || null,
             updatedAt: typeof payload.updatedAt === 'number' ? payload.updatedAt : Date.now()
           },
           source: 'backup'
@@ -81,13 +83,14 @@ export async function fetchCloudData() {
 
 /**
  * Đẩy dữ liệu lên Cloud Storage (cả Primary và Backup song song)
- * @param {{ customers: Array, staffList: Array, updatedAt: number }} payload 
+ * @param {{ customers: Array, staffList: Array, userProfile?: object, updatedAt: number }} payload 
  * @returns {Promise<{ success: boolean, results: object }>}
  */
-export async function saveCloudData({ customers, staffList, updatedAt = Date.now() }) {
+export async function saveCloudData({ customers, staffList, userProfile = null, updatedAt = Date.now() }) {
   const syncPayload = {
     customers: customers || [],
     staffList: staffList || [],
+    userProfile: userProfile || null,
     updatedAt
   };
 

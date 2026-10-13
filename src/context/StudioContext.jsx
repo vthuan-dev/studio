@@ -58,6 +58,20 @@ export function StudioProvider({ children }) {
     return Array.isArray(initialCustomersJson) ? initialCustomersJson : [];
   });
 
+  // User Profile with localStorage persistence
+  const PROFILE_STORAGE_KEY = 'meyzi_studio_profile_v1';
+  const [userProfile, setUserProfile] = useState(() => {
+    try {
+      const saved = localStorage.getItem(PROFILE_STORAGE_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return {
+      name: 'Tuyết Mai',
+      role: 'Chủ Studio / Makeup Artist',
+      branch: 'Chi nhánh Hà Nội'
+    };
+  });
+
   // Function to pull latest data from Cloud Storage
   const performCloudFetch = useCallback(async (isManual = false) => {
     if (isManual) setSyncStatus('syncing');
@@ -68,15 +82,18 @@ export function StudioProvider({ children }) {
         const localTime = localUpdatedAtRef.current;
         const cloudCustomers = Array.isArray(res.data.customers) ? res.data.customers : [];
         const cloudStaff = Array.isArray(res.data.staffList) && res.data.staffList.length > 0 ? res.data.staffList : null;
+        const cloudProfile = res.data.userProfile || null;
 
         // Condition 1: Cloud is newer OR local is empty but cloud has data
         if (cloudTime > localTime || (customers.length === 0 && cloudCustomers.length > 0)) {
           isApplyingCloudUpdateRef.current = true;
           setCustomers(cloudCustomers);
           if (cloudStaff) setStaffList(cloudStaff);
+          if (cloudProfile) setUserProfile(cloudProfile);
           localUpdatedAtRef.current = cloudTime;
           localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudCustomers));
           if (cloudStaff) localStorage.setItem(STAFF_STORAGE_KEY, JSON.stringify(cloudStaff));
+          if (cloudProfile) localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(cloudProfile));
           localStorage.setItem(UPDATED_AT_KEY, String(cloudTime));
           setSyncStatus('synced');
           setLastSyncedAt(new Date());
@@ -87,7 +104,7 @@ export function StudioProvider({ children }) {
         // Condition 2: Local is newer than cloud (e.g. offline edits), push local to cloud
         else if (localTime > cloudTime && (customers.length > 0 || localTime > 1)) {
           setSyncStatus('syncing');
-          await saveCloudData({ customers, staffList, updatedAt: localTime });
+          await saveCloudData({ customers, staffList, userProfile, updatedAt: localTime });
           setSyncStatus('synced');
           setLastSyncedAt(new Date());
           if (isManual) {
@@ -111,7 +128,7 @@ export function StudioProvider({ children }) {
       console.error('[StudioContext] Sync error:', err);
       if (isManual) setSyncStatus('error');
     }
-  }, [customers, staffList, showToast]);
+  }, [customers, staffList, userProfile, showToast]);
 
   // Periodic and Event-Driven Sync
   useEffect(() => {
@@ -159,12 +176,13 @@ export function StudioProvider({ children }) {
     localUpdatedAtRef.current = newTimestamp;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(customers));
     localStorage.setItem(STAFF_STORAGE_KEY, JSON.stringify(staffList));
+    localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(userProfile));
     localStorage.setItem(UPDATED_AT_KEY, String(newTimestamp));
 
     setSyncStatus('syncing');
     const timer = setTimeout(async () => {
       try {
-        const res = await saveCloudData({ customers, staffList, updatedAt: newTimestamp });
+        const res = await saveCloudData({ customers, staffList, userProfile, updatedAt: newTimestamp });
         if (res.success) {
           setSyncStatus('synced');
           setLastSyncedAt(new Date());
@@ -177,7 +195,7 @@ export function StudioProvider({ children }) {
     }, 600);
 
     return () => clearTimeout(timer);
-  }, [customers, staffList]);
+  }, [customers, staffList, userProfile]);
 
   const syncNow = useCallback(() => {
     performCloudFetch(true);
@@ -277,24 +295,8 @@ export function StudioProvider({ children }) {
   const [isServicesModalOpen, setIsServicesModalOpen] = useState(false);
   const [isAccessoriesModalOpen, setIsAccessoriesModalOpen] = useState(false);
 
-  // User Profile
-  const [userProfile, setUserProfile] = useState(() => {
-    try {
-      const saved = localStorage.getItem('meyzi_studio_profile_v1');
-      if (saved) return JSON.parse(saved);
-    } catch (e) {}
-    return {
-      name: 'Tuyết Mai',
-      role: 'Chủ Studio / Makeup Artist',
-      branch: 'Chi nhánh Hà Nội'
-    };
-  });
-
   const updateUserProfile = (newProfile) => {
     setUserProfile(newProfile);
-    try {
-      localStorage.setItem('meyzi_studio_profile_v1', JSON.stringify(newProfile));
-    } catch (e) {}
     showToast('Đã cập nhật thông tin chủ studio!', 'success');
   };
 
@@ -671,7 +673,7 @@ export function StudioProvider({ children }) {
           localUpdatedAtRef.current = newTimestamp;
           localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
           localStorage.setItem(UPDATED_AT_KEY, String(newTimestamp));
-          saveCloudData({ customers: parsed, staffList, updatedAt: newTimestamp }).catch(() => {});
+          saveCloudData({ customers: parsed, staffList, userProfile, updatedAt: newTimestamp }).catch(() => {});
           showToast(`Đã đồng bộ thành công ${parsed.length} khách hàng!`);
           setIsExportModalOpen(false);
         } else {
@@ -695,7 +697,7 @@ export function StudioProvider({ children }) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
         localStorage.setItem(UPDATED_AT_KEY, String(newTimestamp));
       } catch (e) {}
-      saveCloudData({ customers: [], staffList, updatedAt: newTimestamp }).catch(() => {});
+      saveCloudData({ customers: [], staffList, userProfile, updatedAt: newTimestamp }).catch(() => {});
       showToast('Đã xóa trắng toàn bộ dữ liệu. Bạn có thể bắt đầu tạo lịch mới!', 'info');
     }
   };
