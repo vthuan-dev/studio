@@ -104,8 +104,10 @@ export const defaultStudioContext = {
   updateStaff: () => {},
   deleteStaff: () => {},
   isAuthenticated: false,
-  login: () => ({ success: false }),
-  logout: () => {},
+  currentUser: { username: 'admin', name: 'Quản trị viên Tuyết Mai', role: 'admin' },
+  login: async () => ({ success: false }),
+  logout: async () => {},
+  changePassword: async () => ({ success: false }),
   syncStatus: 'idle', // 'idle' | 'syncing' | 'synced' | 'error'
   lastSyncedAt: null,
   syncNow: () => {}

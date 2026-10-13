@@ -3,7 +3,7 @@ import initialCustomersJson from '../data/customers.json';
 import initialStaffJson from '../data/staff.json';
 import { STAFFS, SERVICE_CATEGORIES } from '../data/mockData';
 import { StudioContext, defaultStudioContext } from './studioContextInstance';
-import { fetchCloudData, saveCloudData } from '../utils/cloudSync';
+import { fetchCloudData, saveCloudData, authenticateWithCloud, logoutCloud, changePasswordCloud } from '../utils/cloudSync';
 
 const STORAGE_KEY = 'meyzi_studio_customers_v3';
 const STAFF_STORAGE_KEY = 'meyzi_studio_staff_v1';
@@ -205,7 +205,7 @@ export function StudioProvider({ children }) {
 
 
 
-  // Authentication state (tk: admin, mk: 10102020)
+  // Authentication state (Synced with MongoDB Atlas collection 'users')
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     try {
       return localStorage.getItem('meyzi_studio_auth_v1') === 'true';
@@ -214,28 +214,66 @@ export function StudioProvider({ children }) {
     }
   });
 
-  const login = (username, password) => {
-    if (username?.trim() === 'admin' && password === '10102020') {
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('meyzi_studio_user_v1');
+      return saved ? JSON.parse(saved) : { username: 'admin', name: 'Quản trị viên Tuyết Mai', role: 'admin' };
+    } catch {
+      return { username: 'admin', name: 'Quản trị viên Tuyết Mai', role: 'admin' };
+    }
+  });
+
+  const login = async (username, password) => {
+    // 1. Authenticate with MongoDB Atlas Backend
+    const cloudRes = await authenticateWithCloud(username, password);
+    if (cloudRes && cloudRes.success) {
       setIsAuthenticated(true);
+      const userObj = cloudRes.user || { username: username.trim(), name: 'Quản trị viên', role: 'admin' };
+      setCurrentUser(userObj);
       try {
         localStorage.setItem('meyzi_studio_auth_v1', 'true');
-      } catch (e) {
-        console.error('Failed to save auth to localStorage', e);
-      }
-      showToast('Đăng nhập thành công! Chào mừng Quản trị viên.', 'success');
+        localStorage.setItem('meyzi_studio_user_v1', JSON.stringify(userObj));
+      } catch (e) {}
+      showToast(`Đăng nhập thành công! Chào mừng ${userObj.name || 'Quản trị viên'}.`, 'success');
+      performCloudFetch(true);
       return { success: true };
     }
-    return { success: false, message: 'Tài khoản hoặc mật khẩu không chính xác!' };
+
+    // 2. Offline fallback
+    if (username?.trim() === 'admin' && password === '10102020') {
+      setIsAuthenticated(true);
+      const userObj = { username: 'admin', name: 'Quản trị viên Tuyết Mai', role: 'admin' };
+      setCurrentUser(userObj);
+      try {
+        localStorage.setItem('meyzi_studio_auth_v1', 'true');
+        localStorage.setItem('meyzi_studio_user_v1', JSON.stringify(userObj));
+      } catch (e) {}
+      showToast('Đăng nhập ngoại tuyến thành công!', 'success');
+      return { success: true };
+    }
+
+    return { success: false, message: cloudRes?.message || 'Tài khoản hoặc mật khẩu không chính xác!' };
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await logoutCloud();
     setIsAuthenticated(false);
+    setCurrentUser(null);
     try {
       localStorage.removeItem('meyzi_studio_auth_v1');
-    } catch (e) {
-      console.error('Failed to clear auth from localStorage', e);
-    }
+      localStorage.removeItem('meyzi_studio_user_v1');
+    } catch (e) {}
     showToast('Đã đăng xuất khỏi hệ thống.', 'info');
+  };
+
+  const changePassword = async (currentPassword, newPassword) => {
+    const res = await changePasswordCloud(currentUser?.username || 'admin', currentPassword, newPassword);
+    if (res && res.success) {
+      showToast('Đã đổi mật khẩu trên MongoDB Atlas thành công!', 'success');
+      return { success: true };
+    }
+    showToast(res?.message || 'Không thể đổi mật khẩu!', 'error');
+    return { success: false, message: res?.message };
   };
 
   // View settings & responsive detection
@@ -885,8 +923,10 @@ export function StudioProvider({ children }) {
         updateStaff,
         deleteStaff,
         isAuthenticated,
+        currentUser,
         login,
         logout,
+        changePassword,
         syncStatus,
         lastSyncedAt,
         syncNow

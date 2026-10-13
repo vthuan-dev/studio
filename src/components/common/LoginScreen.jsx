@@ -21,7 +21,7 @@ export default function LoginScreen() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     if (e) e.preventDefault();
     setError('');
 
@@ -37,14 +37,16 @@ export default function LoginScreen() {
 
     setIsLoading(true);
 
-    // Simulate snappy verification
-    setTimeout(() => {
-      const res = login(username, password);
+    try {
+      const res = await login(username, password);
       if (!res.success) {
         setError(res.message || 'Tài khoản hoặc mật khẩu không chính xác!');
         setIsLoading(false);
       }
-    }, 200);
+    } catch (err) {
+      setError('Lỗi kết nối máy chủ MongoDB Atlas!');
+      setIsLoading(false);
+    }
   };
 
 

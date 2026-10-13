@@ -15,12 +15,16 @@ export default async function handler(req, res) {
     const customersCol = db.collection('customers');
     const staffCol = db.collection('staff');
     const settingsCol = db.collection('settings');
+    const servicesCol = db.collection('services');
+    const accessoriesCol = db.collection('accessories');
 
     // GET /api/sync -> Lấy toàn bộ dữ liệu mới nhất từ MongoDB Atlas
     if (req.method === 'GET') {
-      const [rawCustomers, rawStaff, config] = await Promise.all([
+      const [rawCustomers, rawStaff, rawServices, rawAccessories, config] = await Promise.all([
         customersCol.find({}).toArray(),
         staffCol.find({}).toArray(),
+        servicesCol.find({}).toArray(),
+        accessoriesCol.find({}).toArray(),
         settingsCol.findOne({ _id: 'studio_config' })
       ]);
 
@@ -34,9 +38,21 @@ export default async function handler(req, res) {
         id: rest.id || _id.toString()
       }));
 
+      const servicesList = rawServices.map(({ _id, ...rest }) => ({
+        ...rest,
+        id: rest.id || _id.toString()
+      }));
+
+      const accessoriesList = rawAccessories.map(({ _id, ...rest }) => ({
+        ...rest,
+        id: rest.id || _id.toString()
+      }));
+
       return res.status(200).json({
         customers,
         staffList: staffList.length > 0 ? staffList : null,
+        servicesList: servicesList.length > 0 ? servicesList : null,
+        accessoriesList: accessoriesList.length > 0 ? accessoriesList : null,
         userProfile: config?.userProfile || null,
         updatedAt: config?.updatedAt || 1
       });
@@ -45,7 +61,7 @@ export default async function handler(req, res) {
     // POST or PUT /api/sync -> Đồng bộ ghi dữ liệu vào MongoDB Atlas
     if (req.method === 'POST' || req.method === 'PUT') {
       const payload = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-      const { customers, staffList, userProfile, updatedAt = Date.now() } = payload || {};
+      const { customers, staffList, servicesList, accessoriesList, userProfile, updatedAt = Date.now() } = payload || {};
 
       const operations = [];
 
@@ -69,7 +85,25 @@ export default async function handler(req, res) {
         })());
       }
 
-      // 3. Cập nhật collection settings (userProfile & updatedAt)
+      // 3. Cập nhật collection services
+      if (Array.isArray(servicesList) && servicesList.length > 0) {
+        operations.push((async () => {
+          await servicesCol.deleteMany({});
+          const cleanServices = servicesList.map(({ _id, ...s }) => s);
+          await servicesCol.insertMany(cleanServices);
+        })());
+      }
+
+      // 4. Cập nhật collection accessories
+      if (Array.isArray(accessoriesList) && accessoriesList.length > 0) {
+        operations.push((async () => {
+          await accessoriesCol.deleteMany({});
+          const cleanAcc = accessoriesList.map(({ _id, ...a }) => a);
+          await accessoriesCol.insertMany(cleanAcc);
+        })());
+      }
+
+      // 5. Cập nhật collection settings (userProfile & updatedAt)
       operations.push(
         settingsCol.updateOne(
           { _id: 'studio_config' },
