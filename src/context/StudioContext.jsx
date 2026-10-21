@@ -118,8 +118,12 @@ export function StudioProvider({ children }) {
 
         const currentLocalCustomers = customersRef.current;
 
-        // Condition 1: Cloud is newer OR local is empty but cloud has data
-        if (cloudTime > localTime || (currentLocalCustomers.length === 0 && cloudCustomers.length > 0)) {
+        // Condition 1: Cloud is newer AND has data, OR local is empty but cloud has data
+        const isCloudNewerWithData = cloudTime > localTime && cloudCustomers.length > 0;
+        const isLocalEmptyCloudHasData = currentLocalCustomers.length === 0 && cloudCustomers.length > 0;
+        const isBothEmpty = currentLocalCustomers.length === 0 && cloudCustomers.length === 0;
+
+        if (isCloudNewerWithData || isLocalEmptyCloudHasData || (isBothEmpty && cloudTime > localTime)) {
           isApplyingCloudUpdateRef.current = true;
           setCustomers(cloudCustomers);
           if (cloudStaff) setStaffList(cloudStaff);
@@ -136,14 +140,17 @@ export function StudioProvider({ children }) {
             showToast(`Đã đồng bộ thành công ${cloudCustomers.length} lịch hẹn từ đám mây!`, 'success');
           }
         } 
-        // Condition 2: Local is newer than cloud (e.g. offline edits), push local to cloud
-        else if (localTime > cloudTime && (currentLocalCustomers.length > 0 || localTime > 1)) {
+        // Condition 2: Local has data but cloud is empty OR local is newer than cloud (push local to cloud)
+        else if (currentLocalCustomers.length > 0 && (cloudCustomers.length === 0 || localTime > cloudTime)) {
           setSyncStatus('syncing');
+          const pushTime = Math.max(localTime, cloudTime, Date.now());
+          localUpdatedAtRef.current = pushTime;
+          localStorage.setItem(UPDATED_AT_KEY, String(pushTime));
           await saveCloudData({ 
             customers: deduplicateCustomers(currentLocalCustomers), 
             staffList: staffListRef.current, 
             userProfile: userProfileRef.current, 
-            updatedAt: localTime 
+            updatedAt: pushTime 
           });
           setSyncStatus('synced');
           setLastSyncedAt(new Date());
