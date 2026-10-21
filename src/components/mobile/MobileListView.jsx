@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, ChevronLeft, Plus, Home, Calendar, Users, MoreHorizontal, Phone } from 'lucide-react';
+import { Search, ChevronLeft, Plus, Home, Calendar, Users, MoreHorizontal, Phone, Cloud, RefreshCw } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 import { ServiceBadge, StatusBadge } from '../common/Badge';
 
@@ -13,7 +13,9 @@ export default function MobileListView() {
     selectedCategory,
     setSelectedCategory,
     stats,
-    openAddModal
+    openAddModal,
+    syncNow,
+    syncStatus
   } = useStudio();
 
   const tabs = [
@@ -41,13 +43,31 @@ export default function MobileListView() {
           <span>Danh sách khách</span>
         </button>
 
-        <button 
-          onClick={() => setMobileScreen('add')}
-          className="p-1.5 rounded-xl bg-[#8D5B4C] text-white flex items-center gap-1 text-[11px] font-semibold"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          <span>Thêm</span>
-        </button>
+        <div className="flex items-center gap-1.5">
+          <button 
+            onClick={syncNow}
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl border text-[11px] font-bold transition-all cursor-pointer ${
+              syncStatus === 'syncing'
+                ? 'bg-[#F5EFE6] text-[#8D5B4C] border-[#8D5B4C]/40 animate-pulse'
+                : 'bg-[#E8F5E9] text-[#2E7D32] border-[#C8E6C9] hover:bg-[#C8E6C9]'
+            }`}
+          >
+            {syncStatus === 'syncing' ? (
+              <RefreshCw className="w-3.5 h-3.5 text-[#8D5B4C] animate-spin" />
+            ) : (
+              <Cloud className="w-3.5 h-3.5 text-[#2E7D32]" />
+            )}
+            <span>{syncStatus === 'syncing' ? 'Đang tải...' : 'Đồng bộ'}</span>
+          </button>
+
+          <button 
+            onClick={() => setMobileScreen('add')}
+            className="p-1.5 px-2.5 rounded-xl bg-[#8D5B4C] text-white flex items-center gap-1 text-[11px] font-semibold"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Thêm</span>
+          </button>
+        </div>
       </div>
 
       {/* Search & Tabs */}

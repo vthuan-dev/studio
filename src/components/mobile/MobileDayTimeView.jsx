@@ -9,7 +9,9 @@ import {
   Users, 
   MoreHorizontal,
   Clock,
-  CalendarDays
+  CalendarDays,
+  Cloud,
+  RefreshCw
 } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 
@@ -23,7 +25,9 @@ export default function MobileDayTimeView() {
     allStaffWithAll,
     selectedDate,
     setSelectedDate,
-    openAddModal
+    openAddModal,
+    syncNow,
+    syncStatus
   } = useStudio();
 
   // Dynamic header date format: "Thứ 5, 05/11/2026"
@@ -166,6 +170,23 @@ export default function MobileDayTimeView() {
         </div>
 
         <div className="flex items-center gap-1">
+          <button 
+            onClick={syncNow}
+            className={`flex items-center gap-1 px-2 py-1 rounded-lg border text-[11px] font-bold transition-all cursor-pointer mr-0.5 ${
+              syncStatus === 'syncing'
+                ? 'bg-[#F5EFE6] text-[#8D5B4C] border-[#8D5B4C]/40 animate-pulse'
+                : 'bg-[#E8F5E9] text-[#2E7D32] border-[#C8E6C9]'
+            }`}
+            title="Đồng bộ đám mây"
+          >
+            {syncStatus === 'syncing' ? (
+              <RefreshCw className="w-3.5 h-3.5 text-[#8D5B4C] animate-spin" />
+            ) : (
+              <Cloud className="w-3.5 h-3.5 text-[#2E7D32]" />
+            )}
+            <span>{syncStatus === 'syncing' ? '...' : 'Đồng bộ'}</span>
+          </button>
+
           <button 
             onClick={handlePrevDay} 
             className="p-1 hover:bg-[#FAF7F2] rounded-lg text-[#8C7E74]"

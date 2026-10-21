@@ -9,7 +9,9 @@ import {
   Settings, 
   RotateCcw,
   Monitor,
-  LogOut
+  LogOut,
+  Cloud,
+  RefreshCw
 } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 import BrandLogo from '../common/BrandLogo';
@@ -25,7 +27,9 @@ export default function MobileDrawer({ isOpen, onClose }) {
     setMobileScreen,
     setViewMode,
     showToast,
-    logout
+    logout,
+    syncNow,
+    syncStatus
   } = useStudio();
 
   if (!isOpen) return null;
@@ -162,19 +166,40 @@ export default function MobileDrawer({ isOpen, onClose }) {
             );
           })}
 
-          <div className="pt-2 border-t border-[#EFE8DE]/80 mt-3" />
+          <div className="pt-2 border-t border-[#EFE8DE]/80 mt-3 space-y-2">
+            {/* Manual Cloud Sync */}
+            <button
+              onClick={() => {
+                syncNow();
+                onClose();
+              }}
+              className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[13px] font-semibold text-[#2E7D32] bg-[#E8F5E9] hover:bg-[#C8E6C9] border border-[#C8E6C9] transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                {syncStatus === 'syncing' ? (
+                  <RefreshCw className="w-4 h-4 text-[#2E7D32] animate-spin" />
+                ) : (
+                  <Cloud className="w-4 h-4 text-[#2E7D32]" />
+                )}
+                <span>Đồng bộ dữ liệu đám mây</span>
+              </div>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-white text-[#2E7D32] font-bold shadow-2xs">
+                {syncStatus === 'syncing' ? 'Đang chạy' : 'Đồng bộ ngay'}
+              </span>
+            </button>
 
-          {/* Switch to Desktop View */}
-          <button
-            onClick={() => {
-              setViewMode('desktop');
-              onClose();
-            }}
-            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13px] font-semibold text-[#8D5B4C] bg-[#F5EFE6] hover:bg-[#EFE5D8] border border-[#E5DCD0]/70 transition-colors"
-          >
-            <Monitor className="w-4 h-4 text-[#8D5B4C]" />
-            <span>Xem giao diện Desktop</span>
-          </button>
+            {/* Switch to Desktop View */}
+            <button
+              onClick={() => {
+                setViewMode('desktop');
+                onClose();
+              }}
+              className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13px] font-semibold text-[#8D5B4C] bg-[#F5EFE6] hover:bg-[#EFE5D8] border border-[#E5DCD0]/70 transition-colors"
+            >
+              <Monitor className="w-4 h-4 text-[#8D5B4C]" />
+              <span>Xem giao diện Desktop</span>
+            </button>
+          </div>
         </nav>
 
         {/* Footer */}

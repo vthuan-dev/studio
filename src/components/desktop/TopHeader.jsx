@@ -319,12 +319,12 @@ export default function TopHeader() {
         {/* Cloud Sync Status & Manual Sync Button */}
         <button
           onClick={syncNow}
-          className={`flex items-center gap-1.5 px-2.5 py-2 rounded-xl border transition-all text-xs font-medium cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border transition-all text-xs font-semibold cursor-pointer ${
             syncStatus === 'syncing'
-              ? 'bg-[#F5EFE6] text-[#8D5B4C] border-[#8D5B4C]/40'
+              ? 'bg-[#F5EFE6] text-[#8D5B4C] border-[#8D5B4C]/40 animate-pulse'
               : syncStatus === 'error'
               ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100'
-              : 'bg-[#F5EFE6] text-[#6C5F57] hover:text-[#2C2420] hover:bg-[#EFE5D8] border-[#E5DCD0]'
+              : 'bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#C8E6C9] border-[#C8E6C9]'
           }`}
           title={
             syncStatus === 'syncing'
@@ -341,12 +341,12 @@ export default function TopHeader() {
           ) : (
             <Cloud className="w-3.5 h-3.5 text-[#2E7D32]" />
           )}
-          <span className="hidden lg:inline text-[11px] font-medium">
+          <span className="text-[11px] font-bold">
             {syncStatus === 'syncing'
               ? 'Đang đồng bộ...'
               : syncStatus === 'error'
               ? 'Lỗi đồng bộ'
-              : 'Đã đồng bộ'}
+              : 'Đồng bộ'}
           </span>
         </button>
 

@@ -195,7 +195,13 @@ export default function MobileMonthView() {
         <div className="flex items-center gap-1.5">
           <button 
             onClick={syncNow}
-            className="p-1 relative hover:bg-[#FAF7F2] rounded-lg text-[#6C5F57] cursor-pointer"
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl border text-[11px] font-bold transition-all cursor-pointer ${
+              syncStatus === 'syncing'
+                ? 'bg-[#F5EFE6] text-[#8D5B4C] border-[#8D5B4C]/40 animate-pulse'
+                : syncStatus === 'error'
+                ? 'bg-red-50 text-red-600 border-red-200'
+                : 'bg-[#E8F5E9] text-[#2E7D32] border-[#C8E6C9] hover:bg-[#C8E6C9]'
+            }`}
             title={
               syncStatus === 'syncing'
                 ? 'Đang đồng bộ đám mây...'
@@ -205,15 +211,13 @@ export default function MobileMonthView() {
             }
           >
             {syncStatus === 'syncing' ? (
-              <RefreshCw className="w-4 h-4 text-[#8D5B4C] animate-spin" />
+              <RefreshCw className="w-3.5 h-3.5 text-[#8D5B4C] animate-spin" />
             ) : syncStatus === 'error' ? (
-              <CloudOff className="w-4 h-4 text-red-500" />
+              <CloudOff className="w-3.5 h-3.5 text-red-500" />
             ) : (
-              <div className="relative">
-                <Cloud className="w-4 h-4 text-[#2E7D32]" />
-                <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-[#2E7D32] rounded-full"></span>
-              </div>
+              <Cloud className="w-3.5 h-3.5 text-[#2E7D32]" />
             )}
+            <span>{syncStatus === 'syncing' ? 'Đang tải...' : 'Đồng bộ'}</span>
           </button>
 
           <button 
