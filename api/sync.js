@@ -1,5 +1,44 @@
 import { connectToDatabase } from './_lib/mongodb.js';
 
+function deduplicateById(items) {
+  if (!Array.isArray(items)) return [];
+  const map = new Map();
+  for (const item of items) {
+    if (!item) continue;
+    const id = item.id || (item._id ? String(item._id) : null);
+    if (id) {
+      map.set(id, { ...item, id });
+    }
+  }
+  return Array.from(map.values());
+}
+
+async function syncCollectionById(collection, items) {
+  const cleanItems = deduplicateById(items).map(({ _id, ...rest }) => rest);
+  const ids = cleanItems.map(item => item.id).filter(Boolean);
+
+  if (cleanItems.length === 0) {
+    await collection.deleteMany({});
+    return;
+  }
+
+  const bulkOps = cleanItems.map(item => ({
+    updateOne: {
+      filter: { id: item.id },
+      update: { $set: item },
+      upsert: true
+    }
+  }));
+
+  bulkOps.push({
+    deleteMany: {
+      filter: { id: { $nin: ids } }
+    }
+  });
+
+  await collection.bulkWrite(bulkOps, { ordered: false });
+}
+
 export default async function handler(req, res) {
   // CORS Headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -18,7 +57,7 @@ export default async function handler(req, res) {
     const servicesCol = db.collection('services');
     const accessoriesCol = db.collection('accessories');
 
-    // GET /api/sync -> Lấy toàn bộ dữ liệu mới nhất từ MongoDB Atlas
+    // GET /api/sync -> Lấy toàn bộ dữ liệu mới nhất từ MongoDB Atlas (luôn deduplicate)
     if (req.method === 'GET') {
       const [rawCustomers, rawStaff, rawServices, rawAccessories, config] = await Promise.all([
         customersCol.find({}).toArray(),
@@ -28,25 +67,25 @@ export default async function handler(req, res) {
         settingsCol.findOne({ _id: 'studio_config' })
       ]);
 
-      const customers = rawCustomers.map(({ _id, ...rest }) => ({
+      const customers = deduplicateById(rawCustomers.map(({ _id, ...rest }) => ({
         ...rest,
         id: rest.id || _id.toString()
-      }));
+      })));
 
-      const staffList = rawStaff.map(({ _id, ...rest }) => ({
+      const staffList = deduplicateById(rawStaff.map(({ _id, ...rest }) => ({
         ...rest,
         id: rest.id || _id.toString()
-      }));
+      })));
 
-      const servicesList = rawServices.map(({ _id, ...rest }) => ({
+      const servicesList = deduplicateById(rawServices.map(({ _id, ...rest }) => ({
         ...rest,
         id: rest.id || _id.toString()
-      }));
+      })));
 
-      const accessoriesList = rawAccessories.map(({ _id, ...rest }) => ({
+      const accessoriesList = deduplicateById(rawAccessories.map(({ _id, ...rest }) => ({
         ...rest,
         id: rest.id || _id.toString()
-      }));
+      })));
 
       return res.status(200).json({
         customers,
@@ -58,7 +97,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // POST or PUT /api/sync -> Đồng bộ ghi dữ liệu vào MongoDB Atlas
+    // POST or PUT /api/sync -> Đồng bộ ghi dữ liệu an toàn vào MongoDB Atlas
     if (req.method === 'POST' || req.method === 'PUT') {
       let payload = req.body;
       if (typeof payload === 'string') {
@@ -72,42 +111,24 @@ export default async function handler(req, res) {
 
       const operations = [];
 
-      // 1. Cập nhật collection customers
+      // 1. Cập nhật collection customers bằng BulkWrite Upsert an toàn
       if (Array.isArray(customers)) {
-        operations.push((async () => {
-          await customersCol.deleteMany({});
-          if (customers.length > 0) {
-            const cleanCustomers = customers.map(({ _id, ...c }) => c);
-            await customersCol.insertMany(cleanCustomers);
-          }
-        })());
+        operations.push(syncCollectionById(customersCol, customers));
       }
 
       // 2. Cập nhật collection staff
       if (Array.isArray(staffList) && staffList.length > 0) {
-        operations.push((async () => {
-          await staffCol.deleteMany({});
-          const cleanStaff = staffList.map(({ _id, ...s }) => s);
-          await staffCol.insertMany(cleanStaff);
-        })());
+        operations.push(syncCollectionById(staffCol, staffList));
       }
 
       // 3. Cập nhật collection services
       if (Array.isArray(servicesList) && servicesList.length > 0) {
-        operations.push((async () => {
-          await servicesCol.deleteMany({});
-          const cleanServices = servicesList.map(({ _id, ...s }) => s);
-          await servicesCol.insertMany(cleanServices);
-        })());
+        operations.push(syncCollectionById(servicesCol, servicesList));
       }
 
       // 4. Cập nhật collection accessories
       if (Array.isArray(accessoriesList) && accessoriesList.length > 0) {
-        operations.push((async () => {
-          await accessoriesCol.deleteMany({});
-          const cleanAcc = accessoriesList.map(({ _id, ...a }) => a);
-          await accessoriesCol.insertMany(cleanAcc);
-        })());
+        operations.push(syncCollectionById(accessoriesCol, accessoriesList));
       }
 
       // 5. Cập nhật collection settings (userProfile & updatedAt)
@@ -128,7 +149,7 @@ export default async function handler(req, res) {
 
       return res.status(200).json({
         success: true,
-        count: customers?.length || 0,
+        count: Array.isArray(customers) ? deduplicateById(customers).length : 0,
         updatedAt
       });
     }
@@ -142,3 +163,4 @@ export default async function handler(req, res) {
     });
   }
 }
+

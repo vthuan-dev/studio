@@ -53,11 +53,17 @@ export default function MobileAddCustomer() {
     setFormData(prev => ({ ...prev, services: next }));
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleSave = () => {
+    if (isSubmitting) return;
+
     if (!formData.name.trim()) {
       showToast('Vui lòng nhập họ tên khách hàng!', 'error');
       return;
     }
+
+    setIsSubmitting(true);
 
     const catObj = categories.find(c => c.id === formData.category);
     const categoryName = catObj ? catObj.label : 'Cô dâu';
@@ -73,7 +79,7 @@ export default function MobileAddCustomer() {
     });
 
     showToast(`Đã thêm lịch hẹn khách ${formData.name}!`, 'success');
-    setMobileScreen('hourly');
+    setMobileScreen('calendar');
   };
 
   return (
@@ -90,9 +96,12 @@ export default function MobileAddCustomer() {
 
         <button 
           onClick={handleSave}
-          className="font-bold text-sm text-white bg-[#8D5B4C] hover:bg-[#744537] px-3 py-1.5 rounded-xl transition-all shadow-xs"
+          disabled={isSubmitting}
+          className={`font-bold text-sm text-white px-3 py-1.5 rounded-xl transition-all shadow-xs ${
+            isSubmitting ? 'bg-[#8D5B4C]/60 cursor-not-allowed' : 'bg-[#8D5B4C] hover:bg-[#744537]'
+          }`}
         >
-          Lưu
+          {isSubmitting ? 'Đang lưu...' : 'Lưu'}
         </button>
       </div>
 

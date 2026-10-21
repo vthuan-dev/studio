@@ -134,12 +134,18 @@ export default function CustomerModal() {
     }
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
     if (!formData.name.trim()) {
       alert('Vui lòng nhập họ tên khách hàng');
       return;
     }
+
+    setIsSubmitting(true);
 
     const payload = {
       ...formData,
@@ -154,6 +160,7 @@ export default function CustomerModal() {
       addCustomer(payload);
     }
     setIsCustomerModalOpen(false);
+    setIsSubmitting(false);
   };
 
   return (
@@ -517,9 +524,12 @@ export default function CustomerModal() {
             </button>
             <button
               type="submit"
-              className="flex-1 py-3 px-4 rounded-xl font-semibold text-white bg-[#8D5B4C] hover:bg-[#744537] shadow-sm transition-colors"
+              disabled={isSubmitting}
+              className={`flex-1 py-3 px-4 rounded-xl font-semibold text-white transition-colors ${
+                isSubmitting ? 'bg-[#8D5B4C]/60 cursor-not-allowed' : 'bg-[#8D5B4C] hover:bg-[#744537] shadow-sm'
+              }`}
             >
-              Lưu thông tin
+              {isSubmitting ? 'Đang lưu...' : 'Lưu thông tin'}
             </button>
           </div>
         </form>

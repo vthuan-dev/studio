@@ -9,6 +9,20 @@ const STORAGE_KEY = 'meyzi_studio_customers_v3';
 const STAFF_STORAGE_KEY = 'meyzi_studio_staff_v1';
 const UPDATED_AT_KEY = 'meyzi_studio_updated_at';
 
+// Helper: Lọc trùng triệt để danh sách theo ID duy nhất
+export function deduplicateCustomers(items) {
+  if (!Array.isArray(items)) return [];
+  const map = new Map();
+  for (const item of items) {
+    if (!item) continue;
+    const id = item.id || (item._id ? String(item._id) : null);
+    if (id && !map.has(id)) {
+      map.set(id, { ...item, id });
+    }
+  }
+  return Array.from(map.values());
+}
+
 export function StudioProvider({ children }) {
   // Toast feedback state (available globally within provider)
   const [toast, setToast] = useState({ message: '', type: 'success', isVisible: false });
@@ -27,6 +41,8 @@ export function StudioProvider({ children }) {
   const localUpdatedAtRef = useRef(Number(localStorage.getItem(UPDATED_AT_KEY) || 0));
   const isApplyingCloudUpdateRef = useRef(false);
   const hasMountedRef = useRef(false);
+  const isSyncingRef = useRef(false);
+  const lastSyncTimestampRef = useRef(0);
 
   // Staff list with JSON and localStorage persistence (CRUD enabled)
   const [staffList, setStaffList] = useState(() => {
@@ -34,28 +50,28 @@ export function StudioProvider({ children }) {
       const saved = localStorage.getItem(STAFF_STORAGE_KEY);
       if (saved !== null) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) return deduplicateCustomers(parsed);
       }
     } catch (e) {
       console.error('Failed to load staff from localStorage', e);
     }
     return Array.isArray(initialStaffJson) && initialStaffJson.length > 0
-      ? initialStaffJson
+      ? deduplicateCustomers(initialStaffJson)
       : STAFFS.filter(s => s.id !== 'all');
   });
 
-  // Customers list with JSON and localStorage persistence
+  // Customers list with JSON and localStorage persistence (luôn deduplicate)
   const [customers, setCustomers] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved !== null) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
+        if (Array.isArray(parsed)) return deduplicateCustomers(parsed);
       }
     } catch (e) {
       console.error('Failed to load localStorage', e);
     }
-    return Array.isArray(initialCustomersJson) ? initialCustomersJson : [];
+    return Array.isArray(initialCustomersJson) ? deduplicateCustomers(initialCustomersJson) : [];
   });
 
   // User Profile with localStorage persistence
@@ -72,20 +88,38 @@ export function StudioProvider({ children }) {
     };
   });
 
-  // Function to pull latest data from Cloud Storage
+  // Refs giữ trạng thái mới nhất để performCloudFetch không bị re-create liên tục gây re-render loop
+  const customersRef = useRef(customers);
+  customersRef.current = customers;
+
+  const staffListRef = useRef(staffList);
+  staffListRef.current = staffList;
+
+  const userProfileRef = useRef(userProfile);
+  userProfileRef.current = userProfile;
+
+  // Function to pull latest data from Cloud Storage (Đảm bảo ID duy nhất & chống race condition)
   const performCloudFetch = useCallback(async (isManual = false) => {
+    if (isSyncingRef.current && !isManual) return;
+    isSyncingRef.current = true;
     if (isManual) setSyncStatus('syncing');
+
     try {
       const res = await fetchCloudData();
       if (res.success && res.data) {
         const cloudTime = res.data.updatedAt || 0;
         const localTime = localUpdatedAtRef.current;
-        const cloudCustomers = Array.isArray(res.data.customers) ? res.data.customers : [];
-        const cloudStaff = Array.isArray(res.data.staffList) && res.data.staffList.length > 0 ? res.data.staffList : null;
+        const rawCloudCustomers = Array.isArray(res.data.customers) ? res.data.customers : [];
+        const cloudCustomers = deduplicateCustomers(rawCloudCustomers);
+        const cloudStaff = Array.isArray(res.data.staffList) && res.data.staffList.length > 0 
+          ? deduplicateCustomers(res.data.staffList) 
+          : null;
         const cloudProfile = res.data.userProfile || null;
 
+        const currentLocalCustomers = customersRef.current;
+
         // Condition 1: Cloud is newer OR local is empty but cloud has data
-        if (cloudTime > localTime || (customers.length === 0 && cloudCustomers.length > 0)) {
+        if (cloudTime > localTime || (currentLocalCustomers.length === 0 && cloudCustomers.length > 0)) {
           isApplyingCloudUpdateRef.current = true;
           setCustomers(cloudCustomers);
           if (cloudStaff) setStaffList(cloudStaff);
@@ -97,16 +131,23 @@ export function StudioProvider({ children }) {
           localStorage.setItem(UPDATED_AT_KEY, String(cloudTime));
           setSyncStatus('synced');
           setLastSyncedAt(new Date());
+          lastSyncTimestampRef.current = Date.now();
           if (isManual) {
             showToast(`Đã đồng bộ thành công ${cloudCustomers.length} lịch hẹn từ đám mây!`, 'success');
           }
         } 
         // Condition 2: Local is newer than cloud (e.g. offline edits), push local to cloud
-        else if (localTime > cloudTime && (customers.length > 0 || localTime > 1)) {
+        else if (localTime > cloudTime && (currentLocalCustomers.length > 0 || localTime > 1)) {
           setSyncStatus('syncing');
-          await saveCloudData({ customers, staffList, userProfile, updatedAt: localTime });
+          await saveCloudData({ 
+            customers: deduplicateCustomers(currentLocalCustomers), 
+            staffList: staffListRef.current, 
+            userProfile: userProfileRef.current, 
+            updatedAt: localTime 
+          });
           setSyncStatus('synced');
           setLastSyncedAt(new Date());
+          lastSyncTimestampRef.current = Date.now();
           if (isManual) {
             showToast('Đã tải dữ liệu mới nhất lên đám mây!', 'success');
           }
@@ -114,6 +155,7 @@ export function StudioProvider({ children }) {
         else {
           setSyncStatus('synced');
           setLastSyncedAt(new Date());
+          lastSyncTimestampRef.current = Date.now();
           if (isManual) {
             showToast('Dữ liệu đã ở trạng thái mới nhất!', 'info');
           }
@@ -127,37 +169,42 @@ export function StudioProvider({ children }) {
     } catch (err) {
       console.error('[StudioContext] Sync error:', err);
       if (isManual) setSyncStatus('error');
+    } finally {
+      isSyncingRef.current = false;
     }
-  }, [customers, staffList, userProfile, showToast]);
+  }, [showToast]);
 
-  // Periodic and Event-Driven Sync
+  // Periodic and Event-Driven Sync (Debounced & Guarded against rapid tab switches)
   useEffect(() => {
     // Initial fetch on mount
     performCloudFetch(false);
 
-    // Auto-sync when user returns to tab or window gains focus
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
+    let focusTimer = null;
+    const handleTrigger = () => {
+      if (document.visibilityState !== 'visible') return;
+      const now = Date.now();
+      // Chặn nếu vừa đồng bộ trong 2 giây trước (chống việc focus + visibilitychange cùng gọi)
+      if (now - lastSyncTimestampRef.current < 2000) return;
+      if (focusTimer) clearTimeout(focusTimer);
+      focusTimer = setTimeout(() => {
         performCloudFetch(false);
-      }
-    };
-    const handleFocus = () => {
-      performCloudFetch(false);
+      }, 500);
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleTrigger);
+    window.addEventListener('focus', handleTrigger);
 
-    // Polling every 15 seconds when user is actively viewing tab
+    // Polling every 20 seconds when user is actively viewing tab
     const interval = setInterval(() => {
       if (document.visibilityState === 'visible') {
         performCloudFetch(false);
       }
-    }, 15000);
+    }, 20000);
 
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', handleFocus);
+      if (focusTimer) clearTimeout(focusTimer);
+      document.removeEventListener('visibilitychange', handleTrigger);
+      window.removeEventListener('focus', handleTrigger);
       clearInterval(interval);
     };
   }, [performCloudFetch]);
@@ -174,9 +221,10 @@ export function StudioProvider({ children }) {
       return;
     }
 
+    const cleanCustomers = deduplicateCustomers(customers);
     const newTimestamp = Date.now();
     localUpdatedAtRef.current = newTimestamp;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(customers));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cleanCustomers));
     localStorage.setItem(STAFF_STORAGE_KEY, JSON.stringify(staffList));
     localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(userProfile));
     localStorage.setItem(UPDATED_AT_KEY, String(newTimestamp));
@@ -184,10 +232,16 @@ export function StudioProvider({ children }) {
     setSyncStatus('syncing');
     const timer = setTimeout(async () => {
       try {
-        const res = await saveCloudData({ customers, staffList, userProfile, updatedAt: newTimestamp });
+        const res = await saveCloudData({ 
+          customers: cleanCustomers, 
+          staffList, 
+          userProfile, 
+          updatedAt: newTimestamp 
+        });
         if (res.success) {
           setSyncStatus('synced');
           setLastSyncedAt(new Date());
+          lastSyncTimestampRef.current = Date.now();
         } else {
           setSyncStatus('error');
         }
@@ -202,6 +256,7 @@ export function StudioProvider({ children }) {
   const syncNow = useCallback(() => {
     performCloudFetch(true);
   }, [performCloudFetch]);
+
 
 
 
@@ -526,10 +581,25 @@ export function StudioProvider({ children }) {
       statusText = 'Đã cọc';
     }
 
+    // Chống nhân bản khi bấm đúp / ấn nhanh liên tục trong 4 giây
+    const normName = (customerData.name || '').trim().toLowerCase();
+    const existing = customersRef.current.find(c => 
+      (c.name || '').trim().toLowerCase() === normName &&
+      c.date === customerData.date &&
+      c.time === customerData.time
+    );
+    if (existing && Date.now() - (existing._createdAt || 0) < 4000) {
+      console.warn('[StudioContext] Đã chặn tạo lịch hẹn trùng lặp:', customerData.name);
+      return;
+    }
+
+    const uniqueId = 'cust-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
+
     const newCustomer = {
       ...customerData,
-      id: 'cust-' + Date.now(),
-      stt: customers.length + 1,
+      id: uniqueId,
+      _createdAt: Date.now(),
+      stt: customersRef.current.length + 1,
       totalAmount,
       depositAmount,
       remainingAmount,
@@ -544,7 +614,7 @@ export function StudioProvider({ children }) {
       ] : []
     };
 
-    setCustomers(prev => [newCustomer, ...prev]);
+    setCustomers(prev => deduplicateCustomers([newCustomer, ...prev]));
     setSelectedCustomerId(newCustomer.id);
   };
 

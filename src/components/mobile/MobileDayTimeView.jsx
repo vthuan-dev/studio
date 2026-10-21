@@ -89,9 +89,16 @@ export default function MobileDayTimeView() {
     }
   }, [selectedDate]);
 
-  // Customers for this specific date
+  // Customers for this specific date (Đảm bảo lọc trùng ID)
   const dayCustomers = useMemo(() => {
-    return filteredCustomers.filter(c => c.date === selectedDate);
+    const list = filteredCustomers.filter(c => c.date === selectedDate);
+    const map = new Map();
+    for (const item of list) {
+      if (item && item.id && !map.has(item.id)) {
+        map.set(item.id, item);
+      }
+    }
+    return Array.from(map.values());
   }, [filteredCustomers, selectedDate]);
 
   // Default timeline hours

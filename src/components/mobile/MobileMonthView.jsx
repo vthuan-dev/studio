@@ -124,9 +124,16 @@ export default function MobileMonthView() {
     return result;
   }, [currentYear, currentMonth]);
 
-  // Bookings for currently selected date
+  // Bookings for currently selected date (Lọc trùng tuyệt đối theo ID)
   const selectedDayBookings = useMemo(() => {
-    return filteredCustomers.filter(item => item.date === selectedDate);
+    const list = filteredCustomers.filter(item => item.date === selectedDate);
+    const map = new Map();
+    for (const b of list) {
+      if (b && b.id && !map.has(b.id)) {
+        map.set(b.id, b);
+      }
+    }
+    return Array.from(map.values());
   }, [filteredCustomers, selectedDate]);
 
   // Format header for selected day: "Thứ 2, 12/10/2026"
@@ -389,10 +396,7 @@ export default function MobileMonthView() {
             </span>
           </div>
           <button
-            onClick={() => {
-              openAddModal({ date: selectedDate });
-              setMobileScreen('add');
-            }}
+            onClick={() => setMobileScreen('add')}
             className="text-[11px] font-semibold text-[#8D5B4C] hover:text-[#744537] flex items-center gap-1"
           >
             <Plus className="w-3.5 h-3.5" />
@@ -470,10 +474,7 @@ export default function MobileMonthView() {
           <div className="p-6 bg-white rounded-xl border border-dashed border-[#E5DCD0] text-center my-2">
             <p className="text-xs text-[#8C7E74] mb-2">Chưa có lịch hẹn nào ngày này</p>
             <button
-              onClick={() => {
-                openAddModal({ date: selectedDate });
-                setMobileScreen('add');
-              }}
+              onClick={() => setMobileScreen('add')}
               className="px-3 py-1.5 bg-[#FAF7F2] hover:bg-[#F5EFE6] text-[#8D5B4C] border border-[#E5DCD0] rounded-lg text-xs font-semibold inline-flex items-center gap-1 transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
@@ -486,10 +487,7 @@ export default function MobileMonthView() {
       {/* Bottom Floating Add Button */}
       <div className="p-3 bg-white border-t border-[#EFE8DE]">
         <button
-          onClick={() => {
-            openAddModal({ date: selectedDate });
-            setMobileScreen('add');
-          }}
+          onClick={() => setMobileScreen('add')}
           className="w-full py-2.5 rounded-xl bg-[#8D5B4C] text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-sm hover:bg-[#744537] transition-all"
         >
           <Plus className="w-4 h-4" />
@@ -524,10 +522,7 @@ export default function MobileMonthView() {
         </button>
 
         <button 
-          onClick={() => {
-            openAddModal({ date: selectedDate });
-            setMobileScreen('add');
-          }}
+          onClick={() => setMobileScreen('add')}
           className="flex flex-col items-center gap-1 text-[#8C7E74]"
         >
           <div className="w-5 h-5 rounded-full border border-gray-400 flex items-center justify-center">
