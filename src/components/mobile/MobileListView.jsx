@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, ChevronLeft, Plus, Home, Calendar, Users, MoreHorizontal, Phone, Cloud, RefreshCw } from 'lucide-react';
+import { Search, ChevronLeft, Plus, Home, Calendar, Users, MoreHorizontal, Phone, Cloud, RefreshCw, TrendingUp } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 import { ServiceBadge, StatusBadge } from '../common/Badge';
 
@@ -15,7 +15,8 @@ export default function MobileListView() {
     stats,
     openAddModal,
     syncNow,
-    syncStatus
+    syncStatus,
+    setIsStatsModalOpen
   } = useStudio();
 
   const tabs = [
@@ -193,11 +194,12 @@ export default function MobileListView() {
         </button>
 
         <button 
-          onClick={() => setMobileScreen('hourly')}
-          className="flex flex-col items-center gap-1 text-[#8C7E74]"
+          onClick={() => setIsStatsModalOpen(true)}
+          className="flex flex-col items-center gap-1 text-[#8D5B4C] hover:text-[#744537] cursor-pointer"
+          title="Báo cáo Doanh thu & Công nợ"
         >
-          <MoreHorizontal className="w-4 h-4" />
-          <span>Khác</span>
+          <TrendingUp className="w-4 h-4 text-[#8D5B4C]" />
+          <span className="font-bold text-[#8D5B4C]">Doanh thu</span>
         </button>
       </div>
     </div>

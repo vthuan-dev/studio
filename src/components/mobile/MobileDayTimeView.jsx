@@ -11,7 +11,8 @@ import {
   Clock,
   CalendarDays,
   Cloud,
-  RefreshCw
+  RefreshCw,
+  TrendingUp
 } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 
@@ -27,7 +28,8 @@ export default function MobileDayTimeView() {
     setSelectedDate,
     openAddModal,
     syncNow,
-    syncStatus
+    syncStatus,
+    setIsStatsModalOpen
   } = useStudio();
 
   // Dynamic header date format: "Thứ 5, 05/11/2026"
@@ -403,11 +405,12 @@ export default function MobileDayTimeView() {
         </button>
 
         <button 
-          onClick={() => setMobileScreen('calendar')}
-          className="flex flex-col items-center gap-1 text-[#8C7E74]"
+          onClick={() => setIsStatsModalOpen(true)}
+          className="flex flex-col items-center gap-1 text-[#8D5B4C] hover:text-[#744537] cursor-pointer"
+          title="Báo cáo Doanh thu & Công nợ"
         >
-          <MoreHorizontal className="w-4 h-4" />
-          <span>Khác</span>
+          <TrendingUp className="w-4 h-4 text-[#8D5B4C]" />
+          <span className="font-bold text-[#8D5B4C]">Doanh thu</span>
         </button>
       </div>
     </div>

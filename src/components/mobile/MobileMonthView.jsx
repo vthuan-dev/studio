@@ -14,7 +14,9 @@ import {
   Sparkles,
   Cloud,
   CloudOff,
-  RefreshCw
+  RefreshCw,
+  TrendingUp,
+  BarChart3
 } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 import MobileDrawer from './MobileDrawer';
@@ -269,10 +271,11 @@ export default function MobileMonthView() {
             </button>
             <button 
               onClick={() => setIsStatsModalOpen(true)}
-              className="p-2 bg-[#F5EFE6] rounded-xl border border-[#E5DCD0] text-[#6C5F57] hover:text-[#8D5B4C]"
-              title="Thống kê"
+              className="flex items-center gap-1 px-2.5 py-1.5 bg-[#F5EFE6] hover:bg-[#EFE5D8] rounded-xl border border-[#E5DCD0] text-[#8D5B4C] font-semibold text-[11px] transition-colors cursor-pointer"
+              title="Xem Báo cáo Doanh thu & Công nợ"
             >
-              <Filter className="w-3.5 h-3.5" />
+              <TrendingUp className="w-3.5 h-3.5 text-[#8D5B4C]" />
+              <span>Doanh thu</span>
             </button>
           </div>
         </div>
@@ -536,11 +539,12 @@ export default function MobileMonthView() {
         </button>
 
         <button 
-          onClick={() => setMobileScreen('hourly')}
-          className="flex flex-col items-center gap-1 text-[#8C7E74]"
+          onClick={() => setIsStatsModalOpen(true)}
+          className="flex flex-col items-center gap-1 text-[#8D5B4C] hover:text-[#744537] cursor-pointer"
+          title="Báo cáo Doanh thu & Công nợ"
         >
-          <MoreHorizontal className="w-4 h-4" />
-          <span>Khác</span>
+          <TrendingUp className="w-4 h-4 text-[#8D5B4C]" />
+          <span className="font-bold text-[#8D5B4C]">Doanh thu</span>
         </button>
       </div>
     </div>
